@@ -1,0 +1,22 @@
+{
+  "name": "orbit",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Orbit is a modern Electron and SQLite spaced repetition app.",
+  "type": "module",
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev --parallel",
+    "format": "oxfmt .",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "typecheck": "turbo typecheck"
+  },
+  "devDependencies": {
+    "@orbit/eslint-config": "workspace:*",
+    "oxfmt": "0.55.0",
+    "turbo": "2.9.18",
+    "typescript": "6.0.3"
+  },
+  "packageManager": "pnpm@11.7.0"
+}

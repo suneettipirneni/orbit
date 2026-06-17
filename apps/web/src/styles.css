@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@source "../../../packages/ui/src/**/*.{ts,tsx}";
+
+#root {
+  min-height: 100vh;
+}
+
+.bg-muted {
+  background: var(--muted);
+}
+
+.text-foreground {
+  color: var(--foreground);
+}
+
+.ring-ring {
+  --tw-ring-color: var(--ring);
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "radix-nova",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "src/styles.css",
+    "baseColor": "neutral",
+    "cssVariables": true
+  },
+  "aliases": {
+    "components": "@orbit/ui/components",
+    "utils": "@orbit/ui/lib/utils",
+    "ui": "@orbit/ui/components",
+    "lib": "@orbit/ui/lib",
+    "hooks": "@orbit/ui/hooks"
+  },
+  "iconLibrary": "lucide"
+}

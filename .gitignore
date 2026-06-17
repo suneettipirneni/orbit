@@ -1,0 +1,9 @@
+node_modules
+dist
+.turbo
+.vite
+*.db
+*.db-shm
+*.db-wal
+coverage
+.DS_Store

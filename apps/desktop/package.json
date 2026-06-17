@@ -1,0 +1,33 @@
+{
+  "name": "@orbit/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch --preserveWatchOutput",
+    "lint": "eslint .",
+    "rebuild:native": "electron-rebuild -f -w better-sqlite3",
+    "start": "electron .",
+    "test": "vitest run --exclude=\"dist/**\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@hono/node-server": "2.0.5",
+    "@orbit/api": "workspace:*",
+    "better-sqlite3": "12.11.1",
+    "drizzle-orm": "0.45.2",
+    "electron": "42.4.0",
+    "hono": "4.12.25"
+  },
+  "devDependencies": {
+    "@orbit/eslint-config": "workspace:*",
+    "@electron/rebuild": "4.0.4",
+    "@types/better-sqlite3": "7.6.13",
+    "@types/node": "25.9.3",
+    "eslint": "10.5.0",
+    "typescript": "6.0.3",
+    "vitest": "4.1.9"
+  }
+}

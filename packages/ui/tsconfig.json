@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "outDir": "dist",
+    "paths": {
+      "@orbit/ui": ["./src/index.ts"],
+      "@orbit/ui/*": ["./src/*"]
+    },
+    "rootDir": "src"
+  },
+  "include": ["src"]
+}
