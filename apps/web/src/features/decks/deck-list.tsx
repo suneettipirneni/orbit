@@ -1,6 +1,7 @@
 import type { DeckSummary } from "@orbit/api";
 import { useQuery } from "@tanstack/react-query";
-import { BookOpen, LibraryBig, Plus } from "lucide-react";
+import { BookOpen, LibraryBig, Plus, Upload } from "lucide-react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@orbit/ui/components/button";
 import { Input } from "@orbit/ui/components/input";
@@ -20,8 +21,10 @@ import {
   SidebarRail,
   SidebarSeparator,
 } from "@orbit/ui/components/sidebar";
-import { useCreateDeckMutation } from "@/lib/mutations/deck";
+import { useCreateDeckMutation, useImportAnkiDecksMutation } from "@/lib/mutations/deck";
 import { decksQueryOptions } from "@/lib/queries/deck";
+
+const ankiImportAccept = ".apkg,.colpkg,.anki2,.anki21,application/zip,application/octet-stream";
 
 export interface DeckListProps {
   onSelectDeck: (deckId: string) => void;
@@ -35,6 +38,8 @@ interface DeckFormValues {
 export function DeckList({ onSelectDeck, selectedDeckId }: DeckListProps) {
   "use no memo";
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [importError, setImportError] = useState<string>();
   const form = useForm<DeckFormValues>({
     defaultValues: {
       name: "",
@@ -43,6 +48,7 @@ export function DeckList({ onSelectDeck, selectedDeckId }: DeckListProps) {
   const decks = useQuery(decksQueryOptions());
   const registerName = form.register("name");
   const createDeck = useCreateDeckMutation();
+  const importAnkiDecks = useImportAnkiDecksMutation();
   const submitDeckForm = form.handleSubmit((values) => {
     if (values.name.trim()) {
       createDeck.mutate(values, {
@@ -53,6 +59,31 @@ export function DeckList({ onSelectDeck, selectedDeckId }: DeckListProps) {
       });
     }
   });
+  const handleImportFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.currentTarget.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    setImportError(undefined);
+    importAnkiDecks.mutate(
+      { file },
+      {
+        onError(error) {
+          setImportError(error instanceof Error ? error.message : "Anki import failed.");
+        },
+        onSuccess(result) {
+          const firstDeck = result.decks[0];
+
+          if (firstDeck) {
+            onSelectDeck(firstDeck.id);
+          }
+        },
+      },
+    );
+    event.currentTarget.value = "";
+  };
 
   return (
     <Sidebar collapsible="icon">
@@ -95,6 +126,24 @@ export function DeckList({ onSelectDeck, selectedDeckId }: DeckListProps) {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
+        <div className="grid gap-2 group-data-[collapsible=icon]:hidden">
+          <input
+            accept={ankiImportAccept}
+            className="hidden"
+            onChange={handleImportFileChange}
+            ref={fileInputRef}
+            type="file"
+          />
+          <Button
+            disabled={importAnkiDecks.isPending}
+            onClick={() => fileInputRef.current?.click()}
+            type="button"
+          >
+            <Upload className="size-4" />
+            {importAnkiDecks.isPending ? "Importing..." : "Import Anki"}
+          </Button>
+          {importError ? <p className="text-xs text-destructive">{importError}</p> : null}
+        </div>
         <form
           className="grid gap-2 group-data-[collapsible=icon]:hidden"
           onSubmit={(event) => {

@@ -22,6 +22,7 @@ export interface ApiClient {
   get<TResponse>(path: string, options?: RequestOptions): Promise<TResponse>;
   patch<TBody, TResponse>(path: string, body: TBody, options?: RequestOptions): Promise<TResponse>;
   post<TBody, TResponse>(path: string, body: TBody, options?: RequestOptions): Promise<TResponse>;
+  postForm<TResponse>(path: string, body: FormData, options?: RequestOptions): Promise<TResponse>;
 }
 
 export function createApiClient(options: ApiClientOptions = {}): ApiClient {
@@ -29,12 +30,17 @@ export function createApiClient(options: ApiClientOptions = {}): ApiClient {
   const fetcher = options.fetcher ?? fetch;
 
   async function request<TResponse>(path: string, init: RequestInit = {}): Promise<TResponse> {
+    const headers =
+      init.body instanceof FormData
+        ? init.headers
+        : {
+            "content-type": "application/json",
+            ...init.headers,
+          };
+
     const response = await fetcher(`${baseUrl}${path}`, {
       ...init,
-      headers: {
-        "content-type": "application/json",
-        ...init.headers,
-      },
+      headers,
     });
 
     if (!response.ok) {
@@ -72,6 +78,14 @@ export function createApiClient(options: ApiClientOptions = {}): ApiClient {
     post<TBody, TResponse>(path: string, body: TBody, requestOptions?: RequestOptions) {
       return request<TResponse>(path, {
         body: JSON.stringify(body),
+        method: "POST",
+        signal: requestOptions?.signal,
+      });
+    },
+    postForm<TResponse>(path: string, body: FormData, requestOptions?: RequestOptions) {
+      return request<TResponse>(path, {
+        body,
+        headers: {},
         method: "POST",
         signal: requestOptions?.signal,
       });

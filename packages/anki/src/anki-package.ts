@@ -2,7 +2,7 @@ import AdmZip from "adm-zip";
 import Database from "better-sqlite3";
 import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { extname, join } from "node:path";
 
 const fieldSeparator = "\u001f";
 
@@ -64,6 +64,19 @@ interface CollectionRow {
 }
 
 export function loadAnkiPackage(filePath: string): AnkiPackage {
+  if (isAnkiCollectionPath(filePath)) {
+    const database = new Database(filePath, { readonly: true });
+
+    try {
+      return {
+        decks: loadDecksFromDatabase(database),
+        media: {},
+      };
+    } finally {
+      database.close();
+    }
+  }
+
   const workdir = mkdtempSync(join(tmpdir(), "orbit-anki-"));
 
   try {
@@ -80,48 +93,8 @@ export function loadAnkiPackage(filePath: string): AnkiPackage {
     const database = new Database(collectionPath, { readonly: true });
 
     try {
-      const collection = database.prepare("select decks from col limit 1").get() as CollectionRow;
-      const deckMap = JSON.parse(collection.decks) as Record<string, CollectionDeck>;
-      const decks = Object.values(deckMap).map((deck) => ({
-        id: Number(deck.id),
-        name: deck.name,
-        notes: [] as AnkiNote[],
-      }));
-      const deckById = new Map(decks.map((deck) => [deck.id, deck]));
-      const notes = database.prepare("select id, mid, flds, tags from notes").all() as RawNote[];
-      const cards = database
-        .prepare("select id, nid, did, due, ivl, factor, reps, lapses from cards")
-        .all() as RawCard[];
-      const cardsByNoteId = groupCardsByNoteId(cards);
-
-      for (const note of notes) {
-        const noteCards = cardsByNoteId.get(note.id) ?? [];
-        const firstDeckId = noteCards[0]?.did;
-
-        if (!firstDeckId) {
-          continue;
-        }
-
-        deckById.get(firstDeckId)?.notes.push({
-          cards: noteCards.map((card) => ({
-            deckId: card.did,
-            due: card.due,
-            factor: card.factor,
-            id: card.id,
-            interval: card.ivl,
-            lapses: card.lapses,
-            noteId: card.nid,
-            repetitions: card.reps,
-          })),
-          fields: note.flds.split(fieldSeparator),
-          id: note.id,
-          modelId: note.mid,
-          tags: note.tags.trim() ? note.tags.trim().split(/\s+/u) : [],
-        });
-      }
-
       return {
-        decks,
+        decks: loadDecksFromDatabase(database),
         media: readMediaManifest(zip),
       };
     } finally {
@@ -130,6 +103,50 @@ export function loadAnkiPackage(filePath: string): AnkiPackage {
   } finally {
     rmSync(workdir, { force: true, recursive: true });
   }
+}
+
+function loadDecksFromDatabase(database: Database.Database) {
+  const collection = database.prepare("select decks from col limit 1").get() as CollectionRow;
+  const deckMap = JSON.parse(collection.decks) as Record<string, CollectionDeck>;
+  const decks = Object.values(deckMap).map((deck) => ({
+    id: Number(deck.id),
+    name: deck.name,
+    notes: [] as AnkiNote[],
+  }));
+  const deckById = new Map(decks.map((deck) => [deck.id, deck]));
+  const notes = database.prepare("select id, mid, flds, tags from notes").all() as RawNote[];
+  const cards = database
+    .prepare("select id, nid, did, due, ivl, factor, reps, lapses from cards")
+    .all() as RawCard[];
+  const cardsByNoteId = groupCardsByNoteId(cards);
+
+  for (const note of notes) {
+    const noteCards = cardsByNoteId.get(note.id) ?? [];
+    const firstDeckId = noteCards[0]?.did;
+
+    if (!firstDeckId) {
+      continue;
+    }
+
+    deckById.get(firstDeckId)?.notes.push({
+      cards: noteCards.map((card) => ({
+        deckId: card.did,
+        due: card.due,
+        factor: card.factor,
+        id: card.id,
+        interval: card.ivl,
+        lapses: card.lapses,
+        noteId: card.nid,
+        repetitions: card.reps,
+      })),
+      fields: note.flds.split(fieldSeparator),
+      id: note.id,
+      modelId: note.mid,
+      tags: note.tags.trim() ? note.tags.trim().split(/\s+/u) : [],
+    });
+  }
+
+  return decks;
 }
 
 export function saveAnkiPackage(filePath: string, ankiPackage: AnkiPackage) {
@@ -333,5 +350,11 @@ function writeDeckRows(database: Database.Database, decks: AnkiDeck[]) {
 }
 
 export function isAnkiPackagePath(filePath: string) {
-  return existsSync(filePath) && filePath.endsWith(".apkg");
+  return (
+    existsSync(filePath) && [".apkg", ".colpkg", ".anki2", ".anki21"].includes(extname(filePath).toLowerCase())
+  );
+}
+
+function isAnkiCollectionPath(filePath: string) {
+  return [".anki2", ".anki21"].includes(extname(filePath).toLowerCase());
 }

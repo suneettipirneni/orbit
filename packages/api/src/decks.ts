@@ -37,6 +37,17 @@ export interface UpdateDeckInput {
   description?: string | null;
 }
 
+export interface ImportAnkiDecksInput {
+  file: File;
+}
+
+export interface ImportAnkiDecksResult {
+  cardCount: number;
+  deckCount: number;
+  decks: Deck[];
+  noteCount: number;
+}
+
 export function listDecks(client: ApiClient) {
   return client.get<DeckSummary[]>("/decks");
 }
@@ -55,4 +66,11 @@ export function updateDeck(client: ApiClient, deckId: string, input: UpdateDeckI
 
 export function deleteDeck(client: ApiClient, deckId: string) {
   return client.delete<void>(`/decks/${deckId}`);
+}
+
+export function importAnkiDecks(client: ApiClient, input: ImportAnkiDecksInput) {
+  const formData = new FormData();
+  formData.append("file", input.file);
+
+  return client.postForm<ImportAnkiDecksResult>("/decks/import/anki", formData);
 }

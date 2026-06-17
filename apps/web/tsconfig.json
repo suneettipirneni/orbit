@@ -8,10 +8,12 @@
     "noEmit": true,
     "paths": {
       "@/*": ["./src/*"],
+      "@orbit/api": ["../../packages/api/src/index.ts"],
+      "@orbit/api/*": ["../../packages/api/src/*"],
       "@orbit/ui": ["../../packages/ui/src/index.ts"],
       "@orbit/ui/*": ["../../packages/ui/src/*"]
     },
     "types": ["vite/client"]
   },
-  "include": ["src", "../../packages/ui/src"]
+  "include": ["src", "../../packages/api/src", "../../packages/ui/src"]
 }

@@ -1,8 +1,10 @@
 import {
   createDeck,
   deleteDeck,
+  importAnkiDecks,
   updateDeck,
   type CreateDeckInput,
+  type ImportAnkiDecksInput,
   type UpdateDeckInput,
 } from "@orbit/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -16,6 +18,22 @@ export function useCreateDeckMutation() {
   return useMutation({
     mutationFn: (input: CreateDeckInput) => createDeck(apiClient, input),
     onSuccess: () => queryClient.invalidateQueries({ exact: true, queryKey: deckQueryKeys.all }),
+  });
+}
+
+export function useImportAnkiDecksMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: ImportAnkiDecksInput) => importAnkiDecks(apiClient, input),
+    onSuccess: (result) =>
+      Promise.all([
+        queryClient.invalidateQueries({ exact: true, queryKey: deckQueryKeys.all }),
+        ...result.decks.map((deck) =>
+          queryClient.invalidateQueries({ queryKey: deckQueryKeys.detail(deck.id) }),
+        ),
+        queryClient.invalidateQueries({ queryKey: reviewQueryKeys.all }),
+      ]),
   });
 }
 

@@ -1,9 +1,7 @@
 import { app, BrowserWindow } from "electron";
 import { join } from "node:path";
-import { createDatabase } from "./lib/database.js";
+import { createDatabase, createRepositories, startApiServer, type ApiServer } from "@orbit/server";
 import { getDatabasePath } from "./lib/app-paths.js";
-import { createRepositories } from "./lib/repos/index.js";
-import { startApiServer, type ApiServer } from "./lib/server.js";
 
 let apiServer: ApiServer | undefined;
 

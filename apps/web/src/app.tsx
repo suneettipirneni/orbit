@@ -5,7 +5,6 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
 } from "@orbit/ui/components/breadcrumb";
-import { Separator } from "@orbit/ui/components/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@orbit/ui/components/sidebar";
 import { TooltipProvider } from "@orbit/ui/components/tooltip";
 import { DeckDetail } from "@/features/decks/deck-detail";
@@ -41,7 +40,6 @@ function OrbitShell() {
         <SidebarInset>
           <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border bg-background px-4">
             <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
