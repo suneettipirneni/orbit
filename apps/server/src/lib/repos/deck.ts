@@ -1,17 +1,21 @@
-import { eq, sql } from "drizzle-orm";
+import { asc, eq, sql } from "drizzle-orm";
 import type { AnkiPackage } from "@orbit/anki";
 import type {
   CreateDeckInput,
   Deck,
   DeckDetail,
   DeckSummary,
+  CardPreview,
   ImportAnkiDecksResult,
+  PaginatedResponse,
+  PaginationInput,
   UpdateDeckInput,
 } from "@orbit/api";
 import type { RepoContext } from "./context.js";
 import { cards } from "../schemas/card.js";
 import { decks } from "../schemas/deck.js";
 import { notes } from "../schemas/note.js";
+import { normalizePagination, paginatedResponse } from "../pagination.js";
 import { nowIso } from "../time.js";
 
 export interface DeckRepo {
@@ -19,7 +23,11 @@ export interface DeckRepo {
   deleteDeck(deckId: string): void;
   getDeck(deckId: string): DeckDetail | undefined;
   importAnkiDecks(ankiPackage: AnkiPackage): ImportAnkiDecksResult;
-  listDecks(): DeckSummary[];
+  listDeckCards(
+    deckId: string,
+    input?: PaginationInput,
+  ): PaginatedResponse<CardPreview> | undefined;
+  listDecks(input?: PaginationInput): PaginatedResponse<DeckSummary>;
   updateDeck(deckId: string, input: UpdateDeckInput): Deck | undefined;
 }
 
@@ -49,7 +57,23 @@ export function createDeckRepo({ handle }: RepoContext): DeckRepo {
         return undefined;
       }
 
-      const deckCards = db
+      return { deck };
+    },
+    listDeckCards(deckId, input) {
+      const deck = db.select({ id: decks.id }).from(decks).where(eq(decks.id, deckId)).get();
+
+      if (!deck) {
+        return undefined;
+      }
+
+      const pagination = normalizePagination(input);
+      const total =
+        db
+          .select({ count: sql<number>`count(*)` })
+          .from(cards)
+          .where(eq(cards.deckId, deckId))
+          .get()?.count ?? 0;
+      const data = db
         .select({
           back: notes.back,
           dueAt: cards.dueAt,
@@ -61,9 +85,12 @@ export function createDeckRepo({ handle }: RepoContext): DeckRepo {
         .from(cards)
         .innerJoin(notes, eq(cards.noteId, notes.id))
         .where(eq(cards.deckId, deckId))
+        .orderBy(asc(cards.createdAt), asc(cards.id))
+        .limit(pagination.limit)
+        .offset(pagination.offset)
         .all();
 
-      return { cards: deckCards, deck };
+      return paginatedResponse(data, pagination, total);
     },
     importAnkiDecks(ankiPackage) {
       return sqlite.transaction(() => {
@@ -140,8 +167,14 @@ export function createDeckRepo({ handle }: RepoContext): DeckRepo {
         };
       })();
     },
-    listDecks() {
-      return db
+    listDecks(input) {
+      const pagination = normalizePagination(input);
+      const total =
+        db
+          .select({ count: sql<number>`count(*)` })
+          .from(decks)
+          .get()?.count ?? 0;
+      const data = db
         .select({
           createdAt: decks.createdAt,
           description: decks.description,
@@ -154,7 +187,12 @@ export function createDeckRepo({ handle }: RepoContext): DeckRepo {
         .from(decks)
         .leftJoin(cards, eq(decks.id, cards.deckId))
         .groupBy(decks.id)
+        .orderBy(asc(decks.createdAt), asc(decks.id))
+        .limit(pagination.limit)
+        .offset(pagination.offset)
         .all();
+
+      return paginatedResponse(data, pagination, total);
     },
     updateDeck(deckId, input) {
       db.update(decks)

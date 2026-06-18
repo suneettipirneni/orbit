@@ -1,16 +1,30 @@
-import { getDeck, listDecks } from "@orbit/api";
+import { getDeck, listDeckCards, listDecks, type PaginationInput } from "@orbit/api";
 import { queryOptions } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
 
 export const deckQueryKeys = {
   all: ["decks"] as const,
+  cards: (deckId: string, input: PaginationInput = {}) =>
+    [...deckQueryKeys.cardsLists(deckId), input.page ?? 1, input.pageSize ?? 50] as const,
+  cardsLists: (deckId: string) => [...deckQueryKeys.detail(deckId), "cards"] as const,
   detail: (deckId: string) => [...deckQueryKeys.all, deckId] as const,
+  list: (input: PaginationInput = {}) =>
+    [...deckQueryKeys.lists(), input.page ?? 1, input.pageSize ?? 50] as const,
+  lists: () => [...deckQueryKeys.all, "list"] as const,
 };
 
-export function decksQueryOptions() {
+export function decksQueryOptions(input: PaginationInput = {}) {
   return queryOptions({
-    queryFn: () => listDecks(apiClient),
-    queryKey: deckQueryKeys.all,
+    queryFn: () => listDecks(apiClient, input),
+    queryKey: deckQueryKeys.list(input),
+  });
+}
+
+export function deckCardsQueryOptions(deckId: string, input: PaginationInput = {}) {
+  return queryOptions({
+    enabled: Boolean(deckId),
+    queryFn: () => listDeckCards(apiClient, deckId, input),
+    queryKey: deckQueryKeys.cards(deckId, input),
   });
 }
 

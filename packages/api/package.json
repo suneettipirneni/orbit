@@ -15,7 +15,9 @@
     "test": "vitest run --passWithNoTests --exclude=\"dist/**\"",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
-  "dependencies": {},
+  "dependencies": {
+    "zod": "4.4.3"
+  },
   "devDependencies": {
     "@orbit/eslint-config": "workspace:*",
     "eslint": "10.5.0",

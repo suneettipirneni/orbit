@@ -27,10 +27,11 @@ export function App() {
 function OrbitShell() {
   const navigate = useNavigate();
   const { deckId } = useParams();
+  const isElectron = window.navigator.userAgent.includes("Electron/");
 
   return (
     <TooltipProvider>
-      <SidebarProvider>
+      <SidebarProvider className={isElectron ? "electron-window" : undefined}>
         <DeckList
           onSelectDeck={(selectedDeckId) => {
             void navigate(`/decks/${selectedDeckId}`);

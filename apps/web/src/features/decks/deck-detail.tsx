@@ -1,20 +1,13 @@
 import type { CardPreview } from "@orbit/api";
-import { flexRender, getCoreRowModel, useReactTable, type ColumnDef } from "@tanstack/react-table";
+import { getCoreRowModel, useReactTable, type ColumnDef } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@orbit/ui/components/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@orbit/ui/components/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@orbit/ui/components/table";
+import { DataTable } from "@orbit/ui/components/data-table";
 import { formatDueDate } from "@/lib/date-format";
 import { CardForm } from "@/features/cards/card-form";
-import { deckQueryOptions } from "@/lib/queries/deck";
+import { deckCardsQueryOptions, deckQueryOptions } from "@/lib/queries/deck";
 
 export interface DeckDetailProps {
   deckId?: string;
@@ -24,6 +17,13 @@ export function DeckDetail({ deckId }: DeckDetailProps) {
   "use no memo";
 
   const deck = useQuery(deckQueryOptions(deckId ?? ""));
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+  const deckCards = useQuery(
+    deckCardsQueryOptions(deckId ?? "", {
+      page: pagination.pageIndex + 1,
+      pageSize: pagination.pageSize,
+    }),
+  );
   const columns = useMemo<ColumnDef<CardPreview>[]>(
     () => [
       {
@@ -51,9 +51,19 @@ export function DeckDetail({ deckId }: DeckDetailProps) {
   );
   const table = useReactTable({
     columns,
-    data: deck.data?.cards ?? [],
+    data: deckCards.data?.data ?? [],
     getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
+    onPaginationChange: setPagination,
+    rowCount: deckCards.data?.pagination.total ?? 0,
+    state: {
+      pagination,
+    },
   });
+
+  useEffect(() => {
+    setPagination((current) => ({ ...current, pageIndex: 0 }));
+  }, [deckId]);
 
   if (!deckId) {
     return (
@@ -80,7 +90,7 @@ export function DeckDetail({ deckId }: DeckDetailProps) {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <div className="mb-2 flex items-center gap-2">
-              <Badge variant="secondary">{deck.data.cards.length} cards</Badge>
+              <Badge variant="secondary">{deckCards.data?.pagination.total ?? 0} cards</Badge>
             </div>
             <h2 className="text-2xl font-semibold tracking-normal">{deck.data.deck.name}</h2>
             <p className="text-sm text-muted-foreground">Build and maintain this study deck.</p>
@@ -94,30 +104,11 @@ export function DeckDetail({ deckId }: DeckDetailProps) {
             <CardTitle>Cards</CardTitle>
           </CardHeader>
           <CardContent className="overflow-auto">
-            <Table>
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id}>
-                        {flexRender(header.column.columnDef.header, header.getContext())}
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id}>
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <DataTable
+              emptyMessage={deckCards.isLoading ? "Loading cards..." : "No cards yet."}
+              pagination={{ totalRows: deckCards.data?.pagination.total ?? 0 }}
+              table={table}
+            />
           </CardContent>
         </Card>
       </div>

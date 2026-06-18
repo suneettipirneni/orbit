@@ -1,4 +1,5 @@
 import type { ApiClient } from "./api-client.js";
+import * as z from "zod/v4";
 
 export interface Note {
   id: string;
@@ -9,16 +10,24 @@ export interface Note {
   updatedAt: string;
 }
 
-export interface CreateNoteInput {
-  deckId: string;
-  front: string;
-  back: string;
-}
+export const createNoteInputSchema = z
+  .object({
+    back: z.string(),
+    deckId: z.string(),
+    front: z.string(),
+  })
+  .strict();
 
-export interface UpdateNoteInput {
-  front?: string;
-  back?: string;
-}
+export type CreateNoteInput = z.infer<typeof createNoteInputSchema>;
+
+export const updateNoteInputSchema = z
+  .object({
+    back: z.string().optional(),
+    front: z.string().optional(),
+  })
+  .strict();
+
+export type UpdateNoteInput = z.infer<typeof updateNoteInputSchema>;
 
 export function createNote(client: ApiClient, input: CreateNoteInput) {
   return client.post<CreateNoteInput, Note>("/notes", input);

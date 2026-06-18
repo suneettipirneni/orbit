@@ -5,3 +5,21 @@
 #root {
   min-height: 100vh;
 }
+
+.electron-window [data-slot="sidebar-header"] {
+  -webkit-app-region: drag;
+  padding-top: 3rem;
+}
+
+.electron-window [data-slot="sidebar-inset"] > header {
+  -webkit-app-region: drag;
+}
+
+.electron-window button,
+.electron-window a,
+.electron-window input,
+.electron-window select,
+.electron-window textarea,
+.electron-window [role="button"] {
+  -webkit-app-region: no-drag;
+}

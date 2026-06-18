@@ -18,7 +18,7 @@ export function useCreateNoteMutation() {
     mutationFn: (input: CreateNoteInput) => createNote(apiClient, input),
     onSuccess: (_note, { deckId }) =>
       Promise.all([
-        queryClient.invalidateQueries({ exact: true, queryKey: deckQueryKeys.all }),
+        queryClient.invalidateQueries({ queryKey: deckQueryKeys.lists() }),
         queryClient.invalidateQueries({ queryKey: deckQueryKeys.detail(deckId) }),
         queryClient.invalidateQueries({ queryKey: reviewQueryKeys.all }),
       ]),
@@ -38,7 +38,7 @@ export function useUpdateNoteMutation() {
       updateNote(apiClient, noteId, input),
     onSuccess: (note) =>
       Promise.all([
-        queryClient.invalidateQueries({ exact: true, queryKey: deckQueryKeys.all }),
+        queryClient.invalidateQueries({ queryKey: deckQueryKeys.lists() }),
         queryClient.invalidateQueries({ queryKey: deckQueryKeys.detail(note.deckId) }),
         queryClient.invalidateQueries({ queryKey: reviewQueryKeys.all }),
         queryClient.invalidateQueries({ queryKey: cardQueryKeys.all }),
@@ -53,7 +53,7 @@ export function useDeleteNoteMutation() {
     mutationFn: (noteId: string) => deleteNote(apiClient, noteId),
     onSuccess: () =>
       Promise.all([
-        queryClient.invalidateQueries({ queryKey: deckQueryKeys.all }),
+        queryClient.invalidateQueries({ queryKey: deckQueryKeys.lists() }),
         queryClient.invalidateQueries({ queryKey: reviewQueryKeys.all }),
         queryClient.invalidateQueries({ queryKey: cardQueryKeys.all }),
       ]),

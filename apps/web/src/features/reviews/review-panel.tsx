@@ -11,7 +11,7 @@ export interface ReviewPanelProps {
 
 export function ReviewPanel({ deckId }: ReviewPanelProps) {
   const dueCards = useQuery(dueCardsQueryOptions({ deckId }));
-  const currentCard = dueCards.data?.[0];
+  const currentCard = dueCards.data?.data[0];
   const review = useSubmitReviewMutation();
 
   function submitRating(value: 1 | 2 | 3 | 4 | 5) {
@@ -32,7 +32,7 @@ export function ReviewPanel({ deckId }: ReviewPanelProps) {
           <h2 className="text-lg font-semibold tracking-normal">Review</h2>
           <p className="text-sm text-muted-foreground">Practice due cards from the active deck.</p>
         </div>
-        <Badge variant="outline">{dueCards.data?.length ?? 0} due</Badge>
+        <Badge variant="outline">{dueCards.data?.pagination.total ?? 0} due</Badge>
       </div>
 
       {!currentCard ? (

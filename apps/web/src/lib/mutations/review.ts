@@ -18,7 +18,7 @@ export function useSubmitReviewMutation() {
       submitReview(apiClient, cardId, rating),
     onSuccess: (result, { cardId }) =>
       Promise.all([
-        queryClient.invalidateQueries({ exact: true, queryKey: deckQueryKeys.all }),
+        queryClient.invalidateQueries({ queryKey: deckQueryKeys.lists() }),
         queryClient.invalidateQueries({ queryKey: deckQueryKeys.detail(result.card.deckId) }),
         queryClient.invalidateQueries({ queryKey: reviewQueryKeys.all }),
         queryClient.invalidateQueries({ queryKey: cardQueryKeys.detail(cardId) }),

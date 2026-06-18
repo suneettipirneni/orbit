@@ -1,4 +1,11 @@
 import type { ApiClient } from "./api-client.js";
+import * as z from "zod/v4";
+import {
+  buildPaginationSearchParams,
+  formatSearchParams,
+  type PaginatedResponse,
+  type PaginationInput,
+} from "./pagination.js";
 
 export interface Deck {
   id: string;
@@ -24,18 +31,25 @@ export interface CardPreview {
 
 export interface DeckDetail {
   deck: Deck;
-  cards: CardPreview[];
 }
 
-export interface CreateDeckInput {
-  name: string;
-  description?: string | null;
-}
+export const createDeckInputSchema = z
+  .object({
+    description: z.string().nullable().optional(),
+    name: z.string(),
+  })
+  .strict();
 
-export interface UpdateDeckInput {
-  name?: string;
-  description?: string | null;
-}
+export type CreateDeckInput = z.infer<typeof createDeckInputSchema>;
+
+export const updateDeckInputSchema = z
+  .object({
+    description: z.string().nullable().optional(),
+    name: z.string().optional(),
+  })
+  .strict();
+
+export type UpdateDeckInput = z.infer<typeof updateDeckInputSchema>;
 
 export interface ImportAnkiDecksInput {
   file: File;
@@ -48,12 +62,20 @@ export interface ImportAnkiDecksResult {
   noteCount: number;
 }
 
-export function listDecks(client: ApiClient) {
-  return client.get<DeckSummary[]>("/decks");
+export function listDecks(client: ApiClient, input: PaginationInput = {}) {
+  return client.get<PaginatedResponse<DeckSummary>>(
+    `/decks${formatSearchParams(buildPaginationSearchParams(input))}`,
+  );
 }
 
 export function getDeck(client: ApiClient, deckId: string) {
   return client.get<DeckDetail>(`/decks/${deckId}`);
+}
+
+export function listDeckCards(client: ApiClient, deckId: string, input: PaginationInput = {}) {
+  return client.get<PaginatedResponse<CardPreview>>(
+    `/decks/${deckId}/cards${formatSearchParams(buildPaginationSearchParams(input))}`,
+  );
 }
 
 export function createDeck(client: ApiClient, input: CreateDeckInput) {

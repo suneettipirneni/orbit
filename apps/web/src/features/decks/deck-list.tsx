@@ -46,6 +46,7 @@ export function DeckList({ onSelectDeck, selectedDeckId }: DeckListProps) {
     },
   });
   const decks = useQuery(decksQueryOptions());
+  const deckItems = decks.data?.data ?? [];
   const registerName = form.register("name");
   const createDeck = useCreateDeckMutation();
   const importAnkiDecks = useImportAnkiDecksMutation();
@@ -108,7 +109,7 @@ export function DeckList({ onSelectDeck, selectedDeckId }: DeckListProps) {
           <SidebarGroupLabel>Decks</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {(decks.data ?? []).map((deck) => (
+              {deckItems.map((deck) => (
                 <DeckMenuItem
                   deck={deck}
                   isActive={deck.id === selectedDeckId}
@@ -116,7 +117,7 @@ export function DeckList({ onSelectDeck, selectedDeckId }: DeckListProps) {
                   onSelectDeck={onSelectDeck}
                 />
               ))}
-              {decks.data?.length === 0 ? (
+              {decks.data?.pagination.total === 0 ? (
                 <SidebarMenuItem>
                   <div className="px-2 py-3 text-sm text-muted-foreground">No decks yet.</div>
                 </SidebarMenuItem>

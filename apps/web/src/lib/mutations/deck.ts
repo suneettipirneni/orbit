@@ -17,7 +17,7 @@ export function useCreateDeckMutation() {
 
   return useMutation({
     mutationFn: (input: CreateDeckInput) => createDeck(apiClient, input),
-    onSuccess: () => queryClient.invalidateQueries({ exact: true, queryKey: deckQueryKeys.all }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: deckQueryKeys.lists() }),
   });
 }
 
@@ -28,7 +28,7 @@ export function useImportAnkiDecksMutation() {
     mutationFn: (input: ImportAnkiDecksInput) => importAnkiDecks(apiClient, input),
     onSuccess: (result) =>
       Promise.all([
-        queryClient.invalidateQueries({ exact: true, queryKey: deckQueryKeys.all }),
+        queryClient.invalidateQueries({ queryKey: deckQueryKeys.lists() }),
         ...result.decks.map((deck) =>
           queryClient.invalidateQueries({ queryKey: deckQueryKeys.detail(deck.id) }),
         ),
@@ -50,7 +50,7 @@ export function useUpdateDeckMutation() {
       updateDeck(apiClient, deckId, input),
     onSuccess: (_deck, { deckId }) =>
       Promise.all([
-        queryClient.invalidateQueries({ exact: true, queryKey: deckQueryKeys.all }),
+        queryClient.invalidateQueries({ queryKey: deckQueryKeys.lists() }),
         queryClient.invalidateQueries({ queryKey: deckQueryKeys.detail(deckId) }),
         queryClient.invalidateQueries({ queryKey: reviewQueryKeys.all }),
       ]),
@@ -64,7 +64,7 @@ export function useDeleteDeckMutation() {
     mutationFn: (deckId: string) => deleteDeck(apiClient, deckId),
     onSuccess: (_result, deckId) =>
       Promise.all([
-        queryClient.invalidateQueries({ exact: true, queryKey: deckQueryKeys.all }),
+        queryClient.invalidateQueries({ queryKey: deckQueryKeys.lists() }),
         queryClient.invalidateQueries({ queryKey: deckQueryKeys.detail(deckId) }),
         queryClient.invalidateQueries({ queryKey: reviewQueryKeys.all }),
       ]),

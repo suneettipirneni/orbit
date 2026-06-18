@@ -1,16 +1,17 @@
-import { and, eq, lte } from "drizzle-orm";
-import type { CardWithNote } from "@orbit/api";
+import { and, eq, lte, sql } from "drizzle-orm";
+import type { CardWithNote, DueCardsInput, PaginatedResponse } from "@orbit/api";
 import type { RepoContext } from "./context.js";
 import { cards } from "../schemas/card.js";
 import { decks } from "../schemas/deck.js";
 import { notes } from "../schemas/note.js";
+import { normalizePagination, paginatedResponse } from "../pagination.js";
 import { reviews } from "../schemas/review.js";
 import { scheduleReview } from "../scheduler.js";
 import { nowIso } from "../time.js";
 
 export interface CardRepo {
   getCard(cardId: string): CardWithNote | undefined;
-  listDueCards(deckId?: string): CardWithNote[];
+  listDueCards(input?: DueCardsInput): PaginatedResponse<CardWithNote>;
   submitReview(cardId: string, rating: 1 | 2 | 3 | 4 | 5): CardWithNote | undefined;
 }
 
@@ -45,11 +46,18 @@ export function createCardRepo({ handle }: RepoContext): CardRepo {
     getCard(cardId) {
       return cardWithNoteWhere(cardId);
     },
-    listDueCards(deckId) {
+    listDueCards(input = {}) {
+      const pagination = normalizePagination(input);
       const dueFilter = lte(cards.dueAt, nowIso());
-      const filter = deckId ? and(dueFilter, eq(cards.deckId, deckId)) : dueFilter;
+      const filter = input.deckId ? and(dueFilter, eq(cards.deckId, input.deckId)) : dueFilter;
+      const total =
+        db
+          .select({ count: sql<number>`count(*)` })
+          .from(cards)
+          .where(filter)
+          .get()?.count ?? 0;
 
-      return db
+      const data = db
         .select({
           back: notes.back,
           createdAt: cards.createdAt,
@@ -70,8 +78,11 @@ export function createCardRepo({ handle }: RepoContext): CardRepo {
         .innerJoin(decks, eq(cards.deckId, decks.id))
         .where(filter)
         .orderBy(cards.dueAt)
-        .limit(50)
+        .limit(pagination.limit)
+        .offset(pagination.offset)
         .all();
+
+      return paginatedResponse(data, pagination, total);
     },
     submitReview(cardId, rating) {
       const card = db.select().from(cards).where(eq(cards.id, cardId)).get();

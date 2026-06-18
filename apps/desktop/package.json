@@ -3,26 +3,32 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "main": "dist/main.js",
+  "main": "out/main/index.js",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "dev": "tsc -p tsconfig.json --watch --preserveWatchOutput",
+    "build": "electron-vite build --config electron.vite.config.ts",
+    "dev": "electron-vite --watch --config electron.vite.config.ts",
     "lint": "eslint .",
-    "rebuild:native": "electron-rebuild -f -w better-sqlite3",
-    "start": "electron .",
+    "postinstall": "electron-builder install-app-deps",
+    "start": "electron-vite preview --config electron.vite.config.ts",
     "test": "vitest run --passWithNoTests --exclude=\"dist/**\"",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@orbit/server": "workspace:*",
+    "better-sqlite3": "12.11.1",
     "electron": "42.4.0"
   },
   "devDependencies": {
     "@orbit/eslint-config": "workspace:*",
-    "@electron/rebuild": "4.0.4",
+    "@tailwindcss/vite": "4.3.1",
     "@types/node": "25.9.3",
+    "@vitejs/plugin-react": "6.0.2",
+    "babel-plugin-react-compiler": "1.0.0",
+    "electron-builder": "26.15.3",
+    "electron-vite": "^5.0.0",
     "eslint": "10.5.0",
     "typescript": "6.0.3",
+    "vite": "8.0.16",
     "vitest": "4.1.9"
   }
 }

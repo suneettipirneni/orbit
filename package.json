@@ -5,15 +5,15 @@
   "description": "Orbit is a modern Electron and SQLite spaced repetition app.",
   "type": "module",
   "scripts": {
-    "build": "turbo build",
-    "dev": "turbo dev --filter=@orbit/web --filter=@orbit/desktop --filter=@orbit/server",
-    "dev:desktop": "turbo dev --filter=@orbit/desktop --filter=@orbit/server",
-    "dev:server": "turbo dev --filter=@orbit/server",
-    "dev:web": "turbo dev --filter=@orbit/web",
+    "build": "turbo run build",
+    "dev": "turbo run dev --filter=@orbit/desktop --filter=@orbit/server",
+    "dev:desktop": "turbo run dev --filter=@orbit/desktop --filter=@orbit/server",
+    "dev:server": "turbo run dev --filter=@orbit/server",
+    "dev:web": "turbo run dev --filter=@orbit/web",
     "format": "oxfmt .",
-    "lint": "turbo lint",
-    "test": "turbo test",
-    "typecheck": "turbo typecheck"
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
     "@orbit/eslint-config": "workspace:*",
