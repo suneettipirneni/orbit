@@ -7,7 +7,7 @@
   "scripts": {
     "build": "pnpm run prepare:native && react-router typegen && react-router build && electron-vite build --config electron.vite.config.ts",
     "dev": "node scripts/dev.mjs",
-    "lint": "eslint .",
+    "lint": "react-router typegen && eslint .",
     "prepare:native": "node scripts/prepare-native.mjs",
     "start": "pnpm run prepare:native && electron-vite preview --config electron.vite.config.ts",
     "test": "vitest run --passWithNoTests --exclude=\"dist/**\"",
