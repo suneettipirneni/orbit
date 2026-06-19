@@ -10,10 +10,10 @@ export default defineConfig({
   main: {
     build: {
       externalizeDeps: {
-        exclude: ["@orbit/anki", "@orbit/api", "@orbit/server"],
+        exclude: ["@orbit/api"],
       },
       rollupOptions: {
-        external: ["electron", "better-sqlite3"],
+        external: ["electron"],
         input: {
           index: resolve(desktopRoot, "src/main.ts"),
         },

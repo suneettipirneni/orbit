@@ -40,7 +40,7 @@ export function CardForm({ deckId }: CardFormProps) {
   });
 
   return (
-    <Card>
+    <Card className="shrink-0">
       <CardHeader>
         <CardTitle>Add card</CardTitle>
       </CardHeader>

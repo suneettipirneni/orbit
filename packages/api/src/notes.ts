@@ -2,8 +2,21 @@ import type { ApiClient } from "./api-client.js";
 import * as z from "zod/v4";
 
 export interface Note {
+  ankiChecksum: number | null;
+  ankiData: string | null;
+  ankiFieldNames: string[] | null;
+  ankiFields: string[] | null;
+  ankiFlags: number | null;
+  ankiGuid: string | null;
+  ankiId: number | null;
+  ankiModelId: number | null;
+  ankiModifiedAt: number | null;
+  ankiSortField: string | null;
+  ankiTags: string[] | null;
+  ankiUpdateSequenceNumber: number | null;
   id: string;
   deckId: string;
+  noteTypeId: string | null;
   front: string;
   back: string;
   createdAt: string;

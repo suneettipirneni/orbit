@@ -11,16 +11,12 @@ const cardIdParamSchema = z
 
 const app = new Hono<ApiEnv>();
 
-app.get(
-  "/:cardId",
-  zValidator("param", cardIdParamSchema),
-  (context) => {
-    const { cardId } = context.req.valid("param");
-    const card = context.var.repositories.getCard(cardId);
+app.get("/:cardId", zValidator("param", cardIdParamSchema), (context) => {
+  const { cardId } = context.req.valid("param");
+  const card = context.var.repositories.getCard(cardId);
 
-    return card ? context.json(card) : context.notFound();
-  },
-);
+  return card ? context.json(card) : context.notFound();
+});
 
 export default app;
 export type CardRoutes = typeof app;

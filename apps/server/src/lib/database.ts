@@ -1,7 +1,9 @@
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
+import { migrate } from "drizzle-orm/better-sqlite3/migrator";
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import * as schema from "./schemas/index.js";
 
 export interface DatabaseHandle {
@@ -9,57 +11,31 @@ export interface DatabaseHandle {
   sqlite: Database.Database;
 }
 
-export function createDatabase(databasePath: string): DatabaseHandle {
+export interface CreateDatabaseOptions {
+  migrationsFolder?: string;
+}
+
+export function createDatabase(
+  databasePath: string,
+  options: CreateDatabaseOptions = {},
+): DatabaseHandle {
   mkdirSync(dirname(databasePath), { recursive: true });
 
   const sqlite = new Database(databasePath);
   sqlite.pragma("journal_mode = WAL");
   sqlite.pragma("foreign_keys = ON");
-  migrate(sqlite);
+
+  const db = drizzle(sqlite, { schema });
+  migrate(db, {
+    migrationsFolder: options.migrationsFolder ?? getDefaultMigrationsFolder(),
+  });
 
   return {
-    db: drizzle(sqlite, { schema }),
+    db,
     sqlite,
   };
 }
 
-function migrate(sqlite: Database.Database) {
-  sqlite.exec(`
-    CREATE TABLE IF NOT EXISTS decks (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      description TEXT,
-      created_at TEXT NOT NULL,
-      updated_at TEXT NOT NULL
-    );
-
-    CREATE TABLE IF NOT EXISTS notes (
-      id TEXT PRIMARY KEY,
-      deck_id TEXT NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
-      front TEXT NOT NULL,
-      back TEXT NOT NULL,
-      created_at TEXT NOT NULL,
-      updated_at TEXT NOT NULL
-    );
-
-    CREATE TABLE IF NOT EXISTS cards (
-      id TEXT PRIMARY KEY,
-      deck_id TEXT NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
-      note_id TEXT NOT NULL REFERENCES notes(id) ON DELETE CASCADE,
-      due_at TEXT NOT NULL,
-      ease_factor REAL NOT NULL,
-      interval_days INTEGER NOT NULL,
-      repetitions INTEGER NOT NULL,
-      lapses INTEGER NOT NULL,
-      created_at TEXT NOT NULL,
-      updated_at TEXT NOT NULL
-    );
-
-    CREATE TABLE IF NOT EXISTS reviews (
-      id TEXT PRIMARY KEY,
-      card_id TEXT NOT NULL REFERENCES cards(id) ON DELETE CASCADE,
-      rating INTEGER NOT NULL,
-      created_at TEXT NOT NULL
-    );
-  `);
+function getDefaultMigrationsFolder() {
+  return fileURLToPath(new URL("./migrations", import.meta.url));
 }

@@ -67,12 +67,34 @@ app.post("/import/anki", async (context) => {
 
 app.get("/:deckId/cards", zValidator("param", deckIdParamSchema), (context) => {
   const { deckId } = context.req.valid("param");
-  const cards = context.var.repositories.listDeckCards(
+  const pagination = parsePaginationQuery(context.req.query.bind(context.req));
+  const cards = context.var.repositories.listDeckCards(deckId, {
+    page: pagination.page,
+    pageSize: pagination.pageSize,
+    query: context.req.query("query") || undefined,
+  });
+
+  return cards ? context.json(cards) : context.notFound();
+});
+
+app.get("/:deckId/note-types", zValidator("param", deckIdParamSchema), (context) => {
+  const { deckId } = context.req.valid("param");
+  const noteTypes = context.var.repositories.listDeckNoteTypes(
     deckId,
     parsePaginationQuery(context.req.query.bind(context.req)),
   );
 
-  return cards ? context.json(cards) : context.notFound();
+  return noteTypes ? context.json(noteTypes) : context.notFound();
+});
+
+app.get("/:deckId/card-types", zValidator("param", deckIdParamSchema), (context) => {
+  const { deckId } = context.req.valid("param");
+  const cardTypes = context.var.repositories.listDeckCardTypes(
+    deckId,
+    parsePaginationQuery(context.req.query.bind(context.req)),
+  );
+
+  return cardTypes ? context.json(cardTypes) : context.notFound();
 });
 
 app.get("/:deckId", zValidator("param", deckIdParamSchema), (context) => {

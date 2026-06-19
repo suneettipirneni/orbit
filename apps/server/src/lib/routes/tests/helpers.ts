@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { createDatabase } from "../../database.js";
 import { createRepositories } from "../../repos/index.js";
 import type { ApiEnv } from "../env.js";
@@ -9,7 +10,9 @@ import routes from "../index.js";
 
 export function createTestContext() {
   const directory = mkdtempSync(join(tmpdir(), "orbit-api-routes-"));
-  const handle = createDatabase(join(directory, "orbit.sqlite"));
+  const handle = createDatabase(join(directory, "orbit.sqlite"), {
+    migrationsFolder: fileURLToPath(new URL("../../migrations", import.meta.url)),
+  });
   const repositories = createRepositories(handle);
   const app = new Hono<ApiEnv>();
 

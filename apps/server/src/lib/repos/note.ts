@@ -43,7 +43,13 @@ export function createNoteRepo({ handle }: RepoContext): NoteRepo {
         })
         .run();
 
-      return note;
+      const created = db.select().from(notes).where(eq(notes.id, note.id)).get();
+
+      if (!created) {
+        throw new Error("Failed to create note.");
+      }
+
+      return created;
     },
     deleteNote(noteId) {
       db.delete(notes).where(eq(notes.id, noteId)).run();

@@ -8,14 +8,11 @@
     "build": "electron-vite build --config electron.vite.config.ts",
     "dev": "electron-vite --watch --config electron.vite.config.ts",
     "lint": "eslint .",
-    "postinstall": "electron-builder install-app-deps",
     "start": "electron-vite preview --config electron.vite.config.ts",
     "test": "vitest run --passWithNoTests --exclude=\"dist/**\"",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@orbit/server": "workspace:*",
-    "better-sqlite3": "12.11.1",
     "electron": "42.4.0"
   },
   "devDependencies": {

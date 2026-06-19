@@ -1,9 +1,5 @@
 import { app, BrowserWindow } from "electron";
 import { join } from "node:path";
-import type { ApiServer } from "@orbit/server";
-import { getDatabasePath } from "./lib/app-paths.js";
-
-let apiServer: ApiServer | undefined;
 
 async function createWindow() {
   const window = new BrowserWindow({
@@ -39,10 +35,6 @@ async function createWindow() {
 void app
   .whenReady()
   .then(async () => {
-    if (process.env.ORBIT_EMBEDDED_API !== "0") {
-      apiServer = await startEmbeddedApiServer();
-    }
-
     await createWindow();
   })
   .catch((error: unknown) => {
@@ -56,20 +48,8 @@ app.on("activate", () => {
   }
 });
 
-app.on("before-quit", () => {
-  apiServer?.close();
-});
-
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
   }
 });
-
-async function startEmbeddedApiServer() {
-  const { createDatabase, createRepositories, startApiServer } = await import("@orbit/server");
-  const database = createDatabase(getDatabasePath());
-  const repositories = createRepositories(database);
-
-  return startApiServer(repositories);
-}

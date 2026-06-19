@@ -1,5 +1,10 @@
 import * as React from "react";
-import { flexRender, type Column, type Table as TanStackTable } from "@tanstack/react-table";
+import {
+  flexRender,
+  type Column,
+  type Row,
+  type Table as TanStackTable,
+} from "@tanstack/react-table";
 import {
   ArrowDownIcon,
   ArrowUpIcon,
@@ -14,6 +19,7 @@ import {
 
 import { cn } from "@orbit/ui/lib/utils";
 import { Button } from "@orbit/ui/components/button";
+import { Checkbox } from "@orbit/ui/components/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -53,6 +59,15 @@ export interface DataTableFilterOptions {
   placeholder?: string;
 }
 
+export interface DataTableColumnVisibilityOptions {
+  className?: string;
+  label?: string;
+}
+
+export interface DataTableSelectionOptions {
+  selectAll?: boolean;
+}
+
 export interface DataTablePaginationProps<TData> extends DataTablePaginationOptions {
   table: TanStackTable<TData>;
 }
@@ -64,20 +79,26 @@ export interface DataTableViewOptionsProps<TData> {
 }
 
 export interface DataTableProps<TData> extends Omit<React.ComponentProps<"div">, "children"> {
+  columnVisibility?: boolean | DataTableColumnVisibilityOptions;
   emptyMessage?: React.ReactNode;
   filter?: DataTableFilterOptions;
   pagination?: boolean | DataTablePaginationOptions;
+  selection?: boolean | DataTableSelectionOptions;
   table: TanStackTable<TData>;
   toolbar?: React.ReactNode;
+  /** @deprecated Use columnVisibility instead. */
   viewOptions?: boolean;
+  /** @deprecated Use columnVisibility.label instead. */
   viewOptionsLabel?: string;
 }
 
 function DataTable<TData>({
   className,
+  columnVisibility,
   emptyMessage = "No results.",
   filter,
   pagination,
+  selection,
   table,
   toolbar,
   viewOptions = false,
@@ -87,27 +108,48 @@ function DataTable<TData>({
   const rows = table.getRowModel().rows;
   const columnCount = table.getVisibleLeafColumns().length || 1;
   const paginationOptions = pagination === true ? {} : pagination || undefined;
-  const hasToolbar = Boolean(filter || toolbar || viewOptions);
+  const columnVisibilityOptions = getColumnVisibilityOptions(
+    columnVisibility,
+    viewOptions,
+    viewOptionsLabel,
+  );
+  const selectionOptions = selection === true ? {} : selection || undefined;
+  const hasSelection = Boolean(selectionOptions);
+  const tableColumnCount = columnCount + (hasSelection ? 1 : 0);
+  const hasToolbar = Boolean(filter || toolbar || columnVisibilityOptions);
+  const stickyHeaderClassName =
+    "sticky top-0 z-10 bg-background after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-border after:content-['']";
 
   return (
-    <div className={cn("flex w-full flex-col gap-4", className)} {...props}>
+    <div className={cn("flex min-h-0 w-full flex-col gap-4", className)} {...props}>
       {hasToolbar ? (
         <DataTableToolbar
+          columnVisibilityOptions={columnVisibilityOptions}
           filter={filter}
           table={table}
-          viewOptions={viewOptions}
-          viewOptionsLabel={viewOptionsLabel}
         >
           {toolbar}
         </DataTableToolbar>
       ) : null}
-      <div className="overflow-hidden rounded-md border">
+      <div className="min-h-0 flex-1 overflow-hidden rounded-md border *:data-[slot=table-container]:h-full *:data-[slot=table-container]:overflow-auto">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="border-b-0!">
+                {hasSelection ? (
+                  <TableHead className={cn(stickyHeaderClassName, "w-10 px-2")}>
+                    <DataTableSelectionHeader
+                      selectAll={selectionOptions?.selectAll}
+                      table={table}
+                    />
+                  </TableHead>
+                ) : null}
                 {headerGroup.headers.map((header) => (
-                  <TableHead colSpan={header.colSpan} key={header.id}>
+                  <TableHead
+                    className={stickyHeaderClassName}
+                    colSpan={header.colSpan}
+                    key={header.id}
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(header.column.columnDef.header, header.getContext())}
@@ -120,6 +162,11 @@ function DataTable<TData>({
             {rows.length ? (
               rows.map((row) => (
                 <TableRow data-state={row.getIsSelected() ? "selected" : undefined} key={row.id}>
+                  {hasSelection ? (
+                    <TableCell className="w-10 px-2">
+                      <DataTableSelectionCell row={row} />
+                    </TableCell>
+                  ) : null}
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -129,7 +176,10 @@ function DataTable<TData>({
               ))
             ) : (
               <TableRow>
-                <TableCell className="h-24 text-center text-muted-foreground" colSpan={columnCount}>
+                <TableCell
+                  className="h-24 text-center text-muted-foreground"
+                  colSpan={tableColumnCount}
+                >
                   {emptyMessage}
                 </TableCell>
               </TableRow>
@@ -144,16 +194,14 @@ function DataTable<TData>({
 
 function DataTableToolbar<TData>({
   children,
+  columnVisibilityOptions,
   filter,
   table,
-  viewOptions,
-  viewOptionsLabel,
 }: {
   children?: React.ReactNode;
+  columnVisibilityOptions?: DataTableColumnVisibilityOptions;
   filter?: DataTableFilterOptions;
   table: TanStackTable<TData>;
-  viewOptions?: boolean;
-  viewOptionsLabel?: string;
 }) {
   const filterColumn = filter ? table.getColumn(filter.columnId) : undefined;
   const filterPlaceholder = filter?.placeholder ?? (filter ? `Filter ${filter.columnId}...` : "");
@@ -169,8 +217,55 @@ function DataTableToolbar<TData>({
         />
       ) : null}
       {children}
-      {viewOptions ? <DataTableViewOptions label={viewOptionsLabel} table={table} /> : null}
+      {columnVisibilityOptions ? (
+        <DataTableViewOptions
+          className={columnVisibilityOptions.className}
+          label={columnVisibilityOptions.label}
+          table={table}
+        />
+      ) : null}
     </div>
+  );
+}
+
+function DataTableSelectionHeader<TData>({
+  selectAll = true,
+  table,
+}: {
+  selectAll?: boolean;
+  table: TanStackTable<TData>;
+}) {
+  if (!selectAll) {
+    return null;
+  }
+
+  const hasSelectableRows = table.getRowModel().rows.some((row) => row.getCanSelect());
+
+  return (
+    <Checkbox
+      aria-label="Select all rows"
+      checked={
+        table.getIsAllPageRowsSelected()
+          ? true
+          : table.getIsSomePageRowsSelected()
+            ? "indeterminate"
+            : false
+      }
+      disabled={!hasSelectableRows}
+      onCheckedChange={(value) => table.toggleAllPageRowsSelected(value === true)}
+    />
+  );
+}
+
+function DataTableSelectionCell<TData>({ row }: { row: Row<TData> }) {
+  return (
+    <Checkbox
+      aria-label="Select row"
+      checked={row.getIsSelected()}
+      disabled={!row.getCanSelect()}
+      onClick={(event) => event.stopPropagation()}
+      onCheckedChange={(value) => row.toggleSelected(value === true)}
+    />
   );
 }
 
@@ -268,7 +363,7 @@ function DataTableViewOptions<TData>({
               key={column.id}
               onCheckedChange={(value) => column.toggleVisibility(!!value)}
             >
-              {column.id}
+              {getColumnLabel(column)}
             </DropdownMenuCheckboxItem>
           ))}
         </DropdownMenuGroup>
@@ -289,6 +384,12 @@ function DataTablePagination<TData>({
   const rowStart = table.getRowModel().rows.length === 0 ? 0 : pageIndex * pageSize + 1;
   const rowEnd = Math.min(rowStart + table.getRowModel().rows.length - 1, rowCount);
   const pageSizeOptions = normalizePageSizeOptions(pageSizeOptionsProp);
+  const selectedRowCount = table.options.manualPagination
+    ? Object.values(table.getState().rowSelection).filter(Boolean).length
+    : table.getFilteredSelectedRowModel().rows.length;
+  const selectedTotalRows = table.options.manualPagination
+    ? rowCount
+    : table.getFilteredRowModel().rows.length;
 
   React.useEffect(() => {
     if (pageSize > 100) {
@@ -301,8 +402,7 @@ function DataTablePagination<TData>({
       <div className="flex-1 text-sm text-muted-foreground" aria-live="polite">
         {showSelectedCount ? (
           <>
-            {table.getFilteredSelectedRowModel().rows.length} of{" "}
-            {table.getFilteredRowModel().rows.length} row(s) selected.
+            {selectedRowCount} of {selectedTotalRows} row(s) selected.
           </>
         ) : (
           <>
@@ -390,6 +490,24 @@ function normalizePageSizeOptions(options: number[] = [10, 25, 50, 100]) {
     .sort((first, second) => first - second);
 
   return normalized.length ? normalized : [10, 25, 50, 100];
+}
+
+function getColumnVisibilityOptions(
+  columnVisibility: boolean | DataTableColumnVisibilityOptions | undefined,
+  viewOptions: boolean,
+  viewOptionsLabel: string | undefined,
+) {
+  if (columnVisibility !== undefined) {
+    return columnVisibility === true ? {} : columnVisibility || undefined;
+  }
+
+  return viewOptions ? { label: viewOptionsLabel } : undefined;
+}
+
+function getColumnLabel<TData>(column: Column<TData, unknown>) {
+  const header = column.columnDef.header;
+
+  return typeof header === "string" ? header : column.id;
 }
 
 export { DataTable, DataTableColumnHeader, DataTablePagination, DataTableViewOptions };

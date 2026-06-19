@@ -23,14 +23,43 @@ export interface DeckSummary extends Deck {
 export interface CardPreview {
   id: string;
   noteId: string;
+  cardTypeId: string | null;
+  ankiCardType: string | null;
+  ankiSortField: string | null;
+  ankiType: number | null;
   front: string;
   back: string;
   dueAt: string;
   intervalDays: number;
 }
 
+export interface NoteType {
+  id: string;
+  deckId: string;
+  ankiId: number | null;
+  name: string;
+  fieldNames: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CardType {
+  id: string;
+  deckId: string;
+  noteTypeId: string | null;
+  noteTypeName: string | null;
+  ankiOrder: number | null;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface DeckDetail {
   deck: Deck;
+}
+
+export interface ListDeckCardsInput extends PaginationInput {
+  query?: string;
 }
 
 export const createDeckInputSchema = z
@@ -72,9 +101,27 @@ export function getDeck(client: ApiClient, deckId: string) {
   return client.get<DeckDetail>(`/decks/${deckId}`);
 }
 
-export function listDeckCards(client: ApiClient, deckId: string, input: PaginationInput = {}) {
+export function listDeckCards(client: ApiClient, deckId: string, input: ListDeckCardsInput = {}) {
+  const searchParams = buildPaginationSearchParams(input);
+
+  if (input.query) {
+    searchParams.set("query", input.query);
+  }
+
   return client.get<PaginatedResponse<CardPreview>>(
-    `/decks/${deckId}/cards${formatSearchParams(buildPaginationSearchParams(input))}`,
+    `/decks/${deckId}/cards${formatSearchParams(searchParams)}`,
+  );
+}
+
+export function listDeckNoteTypes(client: ApiClient, deckId: string, input: PaginationInput = {}) {
+  return client.get<PaginatedResponse<NoteType>>(
+    `/decks/${deckId}/note-types${formatSearchParams(buildPaginationSearchParams(input))}`,
+  );
+}
+
+export function listDeckCardTypes(client: ApiClient, deckId: string, input: PaginationInput = {}) {
+  return client.get<PaginatedResponse<CardType>>(
+    `/decks/${deckId}/card-types${formatSearchParams(buildPaginationSearchParams(input))}`,
   );
 }
 
