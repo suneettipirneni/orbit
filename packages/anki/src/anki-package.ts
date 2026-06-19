@@ -115,7 +115,7 @@ interface CollectionRow {
 
 export function loadAnkiPackage(filePath: string): AnkiPackage {
   if (isAnkiCollectionPath(filePath)) {
-    const database = new Database(filePath, { readonly: true });
+    const database = new Database(filePath, getDatabaseOptions({ readonly: true }));
 
     try {
       return {
@@ -140,7 +140,7 @@ export function loadAnkiPackage(filePath: string): AnkiPackage {
     const collectionPath = join(workdir, "collection.anki2");
     writeFileSync(collectionPath, collectionEntry.getData());
 
-    const database = new Database(collectionPath, { readonly: true });
+    const database = new Database(collectionPath, getDatabaseOptions({ readonly: true }));
 
     try {
       return {
@@ -248,7 +248,7 @@ export function saveAnkiPackage(filePath: string, ankiPackage: AnkiPackage) {
 
   try {
     const collectionPath = join(workdir, "collection.anki2");
-    const database = new Database(collectionPath);
+    const database = new Database(collectionPath, getDatabaseOptions());
 
     try {
       createAnkiSchema(database);
@@ -265,6 +265,13 @@ export function saveAnkiPackage(filePath: string, ankiPackage: AnkiPackage) {
   } finally {
     rmSync(workdir, { force: true, recursive: true });
   }
+}
+
+function getDatabaseOptions(options: Database.Options = {}) {
+  return {
+    ...options,
+    nativeBinding: process.env.ORBIT_BETTER_SQLITE3_NATIVE_BINDING,
+  };
 }
 
 function groupCardsByNoteId(cards: RawCard[]) {

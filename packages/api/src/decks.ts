@@ -18,6 +18,9 @@ export interface Deck {
 export interface DeckSummary extends Deck {
   totalCards: number;
   dueCards: number;
+  newCards: number;
+  learningCards: number;
+  reviewCards: number;
 }
 
 export interface CardPreview {
@@ -25,12 +28,20 @@ export interface CardPreview {
   noteId: string;
   cardTypeId: string | null;
   ankiCardType: string | null;
+  ankiDue: number | null;
+  ankiFlags: number | null;
+  ankiOrder: number | null;
+  ankiQueue: number | null;
   ankiSortField: string | null;
+  ankiTags: string[] | null;
   ankiType: number | null;
   front: string;
   back: string;
+  deckId: string;
+  deckName: string;
   dueAt: string;
   intervalDays: number;
+  repetitions: number;
 }
 
 export interface NoteType {
@@ -56,6 +67,17 @@ export interface CardType {
 
 export interface DeckDetail {
   deck: Deck;
+  counts: {
+    total: number;
+    due: number;
+    new: number;
+    learning: number;
+    review: number;
+  };
+}
+
+export interface DeleteDeckResult {
+  deletedCards: number;
 }
 
 export interface ListDeckCardsInput extends PaginationInput {
@@ -134,7 +156,7 @@ export function updateDeck(client: ApiClient, deckId: string, input: UpdateDeckI
 }
 
 export function deleteDeck(client: ApiClient, deckId: string) {
-  return client.delete<void>(`/decks/${deckId}`);
+  return client.delete<DeleteDeckResult>(`/decks/${deckId}`);
 }
 
 export function importAnkiDecks(client: ApiClient, input: ImportAnkiDecksInput) {

@@ -23,11 +23,14 @@ export interface Note {
   updatedAt: string;
 }
 
+const usableNoteFieldSchema = z.string().refine((value) => value.trim().length > 0);
+const noteTagSchema = z.string();
+
 export const createNoteInputSchema = z
   .object({
-    back: z.string(),
+    back: usableNoteFieldSchema,
     deckId: z.string(),
-    front: z.string(),
+    front: usableNoteFieldSchema,
   })
   .strict();
 
@@ -35,8 +38,11 @@ export type CreateNoteInput = z.infer<typeof createNoteInputSchema>;
 
 export const updateNoteInputSchema = z
   .object({
+    addTags: z.array(noteTagSchema).optional(),
     back: z.string().optional(),
     front: z.string().optional(),
+    marked: z.boolean().optional(),
+    removeTags: z.array(noteTagSchema).optional(),
   })
   .strict();
 

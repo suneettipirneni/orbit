@@ -23,10 +23,55 @@ importers:
 
   apps/desktop:
     dependencies:
+      '@orbit/anki':
+        specifier: workspace:*
+        version: link:../../packages/anki
+      '@orbit/api':
+        specifier: workspace:*
+        version: link:../../packages/api
+      '@orbit/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@orbit/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      '@pierre/trees':
+        specifier: 1.0.0-beta.4
+        version: 1.0.0-beta.4(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@tanstack/react-query':
+        specifier: 5.101.0
+        version: 5.101.0(react@19.2.7)
+      '@tanstack/react-table':
+        specifier: 8.21.3
+        version: 8.21.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      better-sqlite3:
+        specifier: 12.11.1
+        version: 12.11.1
       electron:
         specifier: 42.4.0
         version: 42.4.0
+      lucide-react:
+        specifier: 1.18.0
+        version: 1.18.0(react@19.2.7)
+      react:
+        specifier: 19.2.7
+        version: 19.2.7
+      react-dom:
+        specifier: 19.2.7
+        version: 19.2.7(react@19.2.7)
+      react-hook-form:
+        specifier: 7.79.0
+        version: 7.79.0(react@19.2.7)
+      react-router:
+        specifier: 7.17.0
+        version: 7.17.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      tailwindcss:
+        specifier: 4.3.1
+        version: 4.3.1
     devDependencies:
+      '@electron/rebuild':
+        specifier: 4.0.4
+        version: 4.0.4
       '@orbit/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -36,6 +81,12 @@ importers:
       '@types/node':
         specifier: 25.9.3
         version: 25.9.3
+      '@types/react':
+        specifier: 19.2.17
+        version: 19.2.17
+      '@types/react-dom':
+        specifier: 19.2.3
+        version: 19.2.3(@types/react@19.2.17)
       '@vitejs/plugin-react':
         specifier: 6.0.2
         version: 6.0.2(babel-plugin-react-compiler@1.0.0)(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0))
@@ -61,127 +112,11 @@ importers:
         specifier: 4.1.9
         version: 4.1.9(@types/node@25.9.3)(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0))
 
-  apps/server:
-    dependencies:
-      '@hono/node-server':
-        specifier: 2.0.5
-        version: 2.0.5(hono@4.12.25)
-      '@hono/zod-validator':
-        specifier: 0.8.0
-        version: 0.8.0(hono@4.12.25)(zod@4.4.3)
-      '@orbit/anki':
-        specifier: workspace:*
-        version: link:../../packages/anki
-      '@orbit/api':
-        specifier: workspace:*
-        version: link:../../packages/api
-      better-sqlite3:
-        specifier: 12.11.1
-        version: 12.11.1
-      drizzle-orm:
-        specifier: 0.45.2
-        version: 0.45.2(@types/better-sqlite3@7.6.13)(better-sqlite3@12.11.1)
-      hono:
-        specifier: 4.12.25
-        version: 4.12.25
-      zod:
-        specifier: 4.4.3
-        version: 4.4.3
-    devDependencies:
-      '@orbit/eslint-config':
-        specifier: workspace:*
-        version: link:../../packages/eslint-config
-      '@types/better-sqlite3':
-        specifier: 7.6.13
-        version: 7.6.13
-      '@types/node':
-        specifier: 25.9.3
-        version: 25.9.3
-      eslint:
-        specifier: 10.5.0
-        version: 10.5.0(jiti@2.7.0)
-      typescript:
-        specifier: 6.0.3
-        version: 6.0.3
-      vitest:
-        specifier: 4.1.9
-        version: 4.1.9(@types/node@25.9.3)(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0))
-
-  apps/web:
-    dependencies:
-      '@orbit/api':
-        specifier: workspace:*
-        version: link:../../packages/api
-      '@orbit/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      '@tailwindcss/vite':
-        specifier: 4.3.1
-        version: 4.3.1(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0))
-      '@tanstack/react-query':
-        specifier: 5.101.0
-        version: 5.101.0(react@19.2.7)
-      '@tanstack/react-table':
-        specifier: 8.21.3
-        version: 8.21.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      lucide-react:
-        specifier: 1.18.0
-        version: 1.18.0(react@19.2.7)
-      react:
-        specifier: 19.2.7
-        version: 19.2.7
-      react-dom:
-        specifier: 19.2.7
-        version: 19.2.7(react@19.2.7)
-      react-hook-form:
-        specifier: 7.79.0
-        version: 7.79.0(react@19.2.7)
-      react-router:
-        specifier: 7.17.0
-        version: 7.17.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      tailwindcss:
-        specifier: 4.3.1
-        version: 4.3.1
-      vite:
-        specifier: 8.0.16
-        version: 8.0.16(@types/node@25.9.3)(jiti@2.7.0)
-    devDependencies:
-      '@orbit/eslint-config':
-        specifier: workspace:*
-        version: link:../../packages/eslint-config
-      '@types/node':
-        specifier: 25.9.3
-        version: 25.9.3
-      '@types/react':
-        specifier: 19.2.17
-        version: 19.2.17
-      '@types/react-dom':
-        specifier: 19.2.3
-        version: 19.2.3(@types/react@19.2.17)
-      '@vitejs/plugin-react':
-        specifier: 6.0.2
-        version: 6.0.2(babel-plugin-react-compiler@1.0.0)(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0))
-      babel-plugin-react-compiler:
-        specifier: 1.0.0
-        version: 1.0.0
-      eslint:
-        specifier: 10.5.0
-        version: 10.5.0(jiti@2.7.0)
-      typescript:
-        specifier: 6.0.3
-        version: 6.0.3
-      vitest:
-        specifier: 4.1.9
-        version: 4.1.9(@types/node@25.9.3)(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0))
-
   packages/anki:
     dependencies:
       adm-zip:
         specifier: 0.5.17
         version: 0.5.17
-      better-sqlite3:
-        specifier: 12.11.1
-        version: 12.11.1
     devDependencies:
       '@orbit/eslint-config':
         specifier: workspace:*
@@ -195,6 +130,9 @@ importers:
       '@types/node':
         specifier: 25.9.3
         version: 25.9.3
+      better-sqlite3:
+        specifier: 12.11.1
+        version: 12.11.1
       eslint:
         specifier: 10.5.0
         version: 10.5.0(jiti@2.7.0)
@@ -214,6 +152,40 @@ importers:
       '@orbit/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
+      eslint:
+        specifier: 10.5.0
+        version: 10.5.0(jiti@2.7.0)
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
+      vitest:
+        specifier: 4.1.9
+        version: 4.1.9(@types/node@25.9.3)(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0))
+
+  packages/db:
+    dependencies:
+      '@orbit/anki':
+        specifier: workspace:*
+        version: link:../anki
+      '@orbit/api':
+        specifier: workspace:*
+        version: link:../api
+      drizzle-orm:
+        specifier: 0.45.2
+        version: 0.45.2(@types/better-sqlite3@7.6.13)(better-sqlite3@12.11.1)
+    devDependencies:
+      '@orbit/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@types/better-sqlite3':
+        specifier: 7.6.13
+        version: 7.6.13
+      '@types/node':
+        specifier: 25.9.3
+        version: 25.9.3
+      better-sqlite3:
+        specifier: 12.11.1
+        version: 12.11.1
       eslint:
         specifier: 10.5.0
         version: 10.5.0(jiti@2.7.0)
@@ -792,18 +764,6 @@ packages:
     peerDependencies:
       hono: ^4
 
-  '@hono/node-server@2.0.5':
-    resolution: {integrity: sha512-yQFvDmyDo3y6rEOJZDUYPJ49DIKTPpIk4kGvm40xx4Ejne0Pu9a1+exxPN+C1UppWK/WGZX9F++/Xs231tE86g==}
-    engines: {node: '>=20'}
-    peerDependencies:
-      hono: ^4
-
-  '@hono/zod-validator@0.8.0':
-    resolution: {integrity: sha512-5uS4S1/LKtZQYvD4BtpPUFkOv8d1wNxHHrChm26buMiEYc1FrHWvDUaKVBwkiVtvSExHSpLGDvcnpI2Copyj9w==}
-    peerDependencies:
-      hono: '>=4.10.0'
-      zod: ^3.25.0 || ^4.0.0
-
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
     engines: {node: '>=18.18.0'}
@@ -1038,6 +998,12 @@ packages:
   '@peculiar/webcrypto@1.7.1':
     resolution: {integrity: sha512-ODOov0sGMJMf3jPonOkgGqPknTsu+DdQ7kD++gz8aI+aFMOMHFbWAA2taqXXVTdP+OTOQR/znGvSpmkeI0WTYQ==}
     engines: {node: '>=14.18.0'}
+
+  '@pierre/trees@1.0.0-beta.4':
+    resolution: {integrity: sha512-OfT1yk9ne8Te5+GB5zUY8yqE6B8BqjBHQJleH4lu8ltwNpoocZl4vXt1AzlEExpxI/pp+AFX5QG+lR3JjtTEag==}
+    peerDependencies:
+      react: ^18.3.1 || ^19.0.0
+      react-dom: ^18.3.1 || ^19.0.0
 
   '@radix-ui/number@1.1.2':
     resolution: {integrity: sha512-ceTwaxc4I5IOi97DgCotl3pqiyRGvffcc0oOsE2dQYaJOFIDsDt4VWG6xEbg1QePv9QWausCEIppud/tJ1wNig==}
@@ -4085,6 +4051,14 @@ packages:
     resolution: {integrity: sha512-dM0jVuXJPsDN6DvRpea484tCUaMiXWjuCn++HGTqUWzGDjv5tZkEZldAJ/UMlqRYGFrD/etByo4/xOuC/snX2A==}
     engines: {node: '>=20'}
 
+  preact-render-to-string@6.6.5:
+    resolution: {integrity: sha512-O6MHzYNIKYaiSX3bOw0gGZfEbOmlIDtDfWwN1JJdc/T3ihzRT6tGGSEWE088dWrEDGa1u7101q+6fzQnO9XCPA==}
+    peerDependencies:
+      preact: '>=10 || >= 11.0.0-0'
+
+  preact@11.0.0-beta.0:
+    resolution: {integrity: sha512-IcODoASASYwJ9kxz7+MJeiJhvLriwSb4y4mHIyxdgaRZp6kPUud7xytrk/6GZw8U3y6EFJaRb5wi9SrEK+8+lg==}
+
   prebuild-install@7.1.3:
     resolution: {integrity: sha512-8Mf2cbV7x1cXPUILADGI3wuhfqWvtiLA1iclTDbFRZkgRQS0NqsPZphna9V+HyTEadheuPmjaJMsbzKQFOzLug==}
     engines: {node: '>=10'}
@@ -5455,15 +5429,6 @@ snapshots:
     dependencies:
       hono: 4.12.25
 
-  '@hono/node-server@2.0.5(hono@4.12.25)':
-    dependencies:
-      hono: 4.12.25
-
-  '@hono/zod-validator@0.8.0(hono@4.12.25)(zod@4.4.3)':
-    dependencies:
-      hono: 4.12.25
-      zod: 4.4.3
-
   '@humanfs/core@0.19.2':
     dependencies:
       '@humanfs/types': 0.15.0
@@ -5649,6 +5614,13 @@ snapshots:
       '@peculiar/utils': 2.0.3
       tslib: 2.8.1
       webcrypto-core: 1.9.2
+
+  '@pierre/trees@1.0.0-beta.4(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+    dependencies:
+      preact: 11.0.0-beta.0
+      preact-render-to-string: 6.6.5(preact@11.0.0-beta.0)
+      react: 19.2.7
+      react-dom: 19.2.7(react@19.2.7)
 
   '@radix-ui/number@1.1.2': {}
 
@@ -8619,6 +8591,12 @@ snapshots:
     optional: true
 
   powershell-utils@0.1.0: {}
+
+  preact-render-to-string@6.6.5(preact@11.0.0-beta.0):
+    dependencies:
+      preact: 11.0.0-beta.0
+
+  preact@11.0.0-beta.0: {}
 
   prebuild-install@7.1.3:
     dependencies:

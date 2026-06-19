@@ -3,7 +3,7 @@ import config from "@orbit/eslint-config";
 export default [
   ...config,
   {
-    ignores: ["out/**"],
+    ignores: ["out/**", "scripts/**"],
   },
   {
     languageOptions: {
