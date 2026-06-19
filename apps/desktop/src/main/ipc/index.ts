@@ -1,12 +1,16 @@
-import type { Repositories } from "@orbit/db";
+import type { OrbitDatabase } from "@orbit/db";
 import { registerCardIpcHandlers } from "./card.js";
 import { registerDeckIpcHandlers } from "./deck.js";
 import { registerNoteIpcHandlers } from "./note.js";
 import { registerReviewIpcHandlers } from "./review.js";
 
-export function registerIpcHandlers(repositories: Repositories) {
-  registerDeckIpcHandlers(repositories);
-  registerCardIpcHandlers(repositories);
-  registerNoteIpcHandlers(repositories);
-  registerReviewIpcHandlers(repositories);
+export interface IpcRuntimeOptions {
+  nativeBinding: string;
+}
+
+export function registerIpcHandlers(db: OrbitDatabase, options: IpcRuntimeOptions) {
+  registerDeckIpcHandlers(db, options);
+  registerCardIpcHandlers(db);
+  registerNoteIpcHandlers(db);
+  registerReviewIpcHandlers(db);
 }

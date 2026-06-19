@@ -7,10 +7,22 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./card": {
+      "types": "./dist/repos/card.d.ts",
+      "import": "./dist/repos/card.js"
+    },
+    "./deck": {
+      "types": "./dist/repos/deck.d.ts",
+      "import": "./dist/repos/deck.js"
+    },
+    "./note": {
+      "types": "./dist/repos/note.d.ts",
+      "import": "./dist/repos/note.js"
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json && rm -rf dist/migrations && cp -R src/migrations dist/migrations",
+    "build": "tsc -p tsconfig.json",
     "lint": "eslint .",
     "test": "vitest run --exclude=\"dist/**\"",
     "typecheck": "tsc -p tsconfig.json --noEmit"
@@ -22,14 +34,9 @@
   },
   "devDependencies": {
     "@orbit/eslint-config": "workspace:*",
-    "@types/better-sqlite3": "7.6.13",
     "@types/node": "25.9.3",
-    "better-sqlite3": "12.11.1",
     "eslint": "10.5.0",
     "typescript": "6.0.3",
     "vitest": "4.1.9"
-  },
-  "peerDependencies": {
-    "better-sqlite3": "12.11.1"
   }
 }

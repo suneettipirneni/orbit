@@ -40,9 +40,11 @@ export const updateNoteInputSchema = z
   .object({
     addTags: z.array(noteTagSchema).optional(),
     back: z.string().optional(),
+    buried: z.boolean().optional(),
     front: z.string().optional(),
     marked: z.boolean().optional(),
     removeTags: z.array(noteTagSchema).optional(),
+    suspended: z.boolean().optional(),
   })
   .strict();
 

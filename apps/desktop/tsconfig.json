@@ -13,5 +13,5 @@
     },
     "types": ["node", "vite/client"]
   },
-  "include": [".react-router/types/**/*", "src"]
+  "include": [".react-router/types/**/*", "e2e/**/*.ts", "playwright.config.ts", "src"]
 }

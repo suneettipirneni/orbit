@@ -113,9 +113,23 @@ interface CollectionRow {
   models: string;
 }
 
-export function loadAnkiPackage(filePath: string): AnkiPackage {
+export interface AnkiPackageDatabaseOptions {
+  nativeBinding: string;
+}
+
+export function isAnkiPackagePath(filePath: string) {
+  return (
+    existsSync(filePath) &&
+    [".apkg", ".colpkg", ".anki2", ".anki21"].includes(extname(filePath).toLowerCase())
+  );
+}
+
+export function loadAnkiPackage(
+  filePath: string,
+  options: AnkiPackageDatabaseOptions,
+): AnkiPackage {
   if (isAnkiCollectionPath(filePath)) {
-    const database = new Database(filePath, getDatabaseOptions({ readonly: true }));
+    const database = new Database(filePath, getDatabaseOptions(options, { readonly: true }));
 
     try {
       return {
@@ -140,7 +154,7 @@ export function loadAnkiPackage(filePath: string): AnkiPackage {
     const collectionPath = join(workdir, "collection.anki2");
     writeFileSync(collectionPath, collectionEntry.getData());
 
-    const database = new Database(collectionPath, getDatabaseOptions({ readonly: true }));
+    const database = new Database(collectionPath, getDatabaseOptions(options, { readonly: true }));
 
     try {
       return {
@@ -153,6 +167,44 @@ export function loadAnkiPackage(filePath: string): AnkiPackage {
   } finally {
     rmSync(workdir, { force: true, recursive: true });
   }
+}
+
+export function saveAnkiPackage(
+  filePath: string,
+  ankiPackage: AnkiPackage,
+  options: AnkiPackageDatabaseOptions,
+) {
+  const workdir = mkdtempSync(join(tmpdir(), "orbit-anki-"));
+
+  try {
+    const collectionPath = join(workdir, "collection.anki2");
+    const database = new Database(collectionPath, getDatabaseOptions(options));
+
+    try {
+      createAnkiSchema(database);
+      writeCollection(database, ankiPackage.decks);
+      writeDeckRows(database, ankiPackage.decks);
+    } finally {
+      database.close();
+    }
+
+    const zip = new AdmZip();
+    zip.addLocalFile(collectionPath, "", "collection.anki2");
+    zip.addFile("media", Buffer.from(JSON.stringify(ankiPackage.media), "utf8"));
+    zip.writeZip(filePath);
+  } finally {
+    rmSync(workdir, { force: true, recursive: true });
+  }
+}
+
+function getDatabaseOptions(
+  packageOptions: AnkiPackageDatabaseOptions,
+  databaseOptions: Database.Options = {},
+) {
+  return {
+    ...databaseOptions,
+    nativeBinding: packageOptions.nativeBinding,
+  };
 }
 
 function loadDecksFromDatabase(database: Database.Database) {
@@ -241,37 +293,6 @@ function getCardType(model: CollectionModel | undefined, order: number) {
   const template = model?.tmpls?.find((candidate) => Number(candidate.ord) === order);
 
   return template?.name ?? null;
-}
-
-export function saveAnkiPackage(filePath: string, ankiPackage: AnkiPackage) {
-  const workdir = mkdtempSync(join(tmpdir(), "orbit-anki-"));
-
-  try {
-    const collectionPath = join(workdir, "collection.anki2");
-    const database = new Database(collectionPath, getDatabaseOptions());
-
-    try {
-      createAnkiSchema(database);
-      writeCollection(database, ankiPackage.decks);
-      writeDeckRows(database, ankiPackage.decks);
-    } finally {
-      database.close();
-    }
-
-    const zip = new AdmZip();
-    zip.addLocalFile(collectionPath, "", "collection.anki2");
-    zip.addFile("media", Buffer.from(JSON.stringify(ankiPackage.media), "utf8"));
-    zip.writeZip(filePath);
-  } finally {
-    rmSync(workdir, { force: true, recursive: true });
-  }
-}
-
-function getDatabaseOptions(options: Database.Options = {}) {
-  return {
-    ...options,
-    nativeBinding: process.env.ORBIT_BETTER_SQLITE3_NATIVE_BINDING,
-  };
 }
 
 function groupCardsByNoteId(cards: RawCard[]) {
@@ -421,7 +442,7 @@ function buildModelsJson(decks: AnkiDeck[]) {
           flds: note.fieldNames.map((name) => ({ name })),
           id: note.modelId,
           name: note.modelName ?? String(note.modelId),
-          tmpls: note.cards.map((card) => ({
+          tmpls: note.cards.map((card: AnkiCard) => ({
             name: card.cardType ?? String(card.order),
             ord: card.order,
           })),
@@ -485,13 +506,6 @@ function writeDeckRows(database: Database.Database, decks: AnkiDeck[]) {
       }
     }
   }
-}
-
-export function isAnkiPackagePath(filePath: string) {
-  return (
-    existsSync(filePath) &&
-    [".apkg", ".colpkg", ".anki2", ".anki21"].includes(extname(filePath).toLowerCase())
-  );
 }
 
 function isAnkiCollectionPath(filePath: string) {

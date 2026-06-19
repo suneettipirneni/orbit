@@ -35,6 +35,7 @@ export interface Card {
 }
 
 export interface CardWithNote extends Card {
+  ankiTags: string[] | null;
   front: string;
   back: string;
   deckName: string;

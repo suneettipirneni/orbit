@@ -28,7 +28,9 @@ const api: OrbitDesktopApi = {
   },
   reviews: {
     listDue: (input) => invoke("orbit:reviews:list-due", input),
+    schedulerStatus: () => invoke("orbit:reviews:scheduler-status"),
     submit: (cardId, rating) => invoke("orbit:reviews:submit", cardId, rating),
+    today: () => invoke("orbit:reviews:today"),
   },
 };
 

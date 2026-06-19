@@ -16,6 +16,7 @@ export const deckQueryKeys = {
       input.page ?? 1,
       input.pageSize ?? 50,
       input.query ?? "",
+      input.searchWithinFormatting ?? false,
     ] as const,
   cardsLists: (deckId: string) => [...deckQueryKeys.detail(deckId), "cards"] as const,
   detail: (deckId: string) => [...deckQueryKeys.all, deckId] as const,

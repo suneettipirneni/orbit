@@ -1,16 +1,17 @@
 import { ipcMain } from "electron";
 import { updateCardInputSchema } from "@orbit/api";
-import type { Repositories } from "@orbit/db";
+import type { OrbitDatabase } from "@orbit/db";
+import * as cardRepo from "@orbit/db/card";
 import { requireFound } from "./shared.js";
 
-export function registerCardIpcHandlers(repositories: Repositories) {
+export function registerCardIpcHandlers(db: OrbitDatabase) {
   ipcMain.handle("orbit:cards:get", (_event, cardId: string) =>
-    requireFound(repositories.getCard(cardId), "Card not found."),
+    requireFound(cardRepo.getCard(db, cardId), "Card not found."),
   );
 
   ipcMain.handle("orbit:cards:update", (_event, cardId: string, input) =>
     requireFound(
-      repositories.updateCard(cardId, updateCardInputSchema.parse(input)),
+      cardRepo.updateCard(db, cardId, updateCardInputSchema.parse(input)),
       "Card not found.",
     ),
   );

@@ -6,6 +6,7 @@ export const reviews = sqliteTable("reviews", {
     .notNull()
     .references(() => cards.id, { onDelete: "cascade" }),
   createdAt: text("created_at").notNull(),
+  elapsedMilliseconds: integer("elapsed_milliseconds"),
   id: text("id").primaryKey(),
   rating: integer("rating").notNull(),
 });

@@ -82,6 +82,7 @@ export interface DeleteDeckResult {
 
 export interface ListDeckCardsInput extends PaginationInput {
   query?: string;
+  searchWithinFormatting?: boolean;
 }
 
 export const createDeckInputSchema = z
@@ -128,6 +129,10 @@ export function listDeckCards(client: ApiClient, deckId: string, input: ListDeck
 
   if (input.query) {
     searchParams.set("query", input.query);
+  }
+
+  if (input.searchWithinFormatting) {
+    searchParams.set("searchWithinFormatting", "true");
   }
 
   return client.get<PaginatedResponse<CardPreview>>(

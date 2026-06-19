@@ -15,6 +15,13 @@
       "when": 1781785100000,
       "tag": "0001_link_card_and_note_types",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1781785200000,
+      "tag": "0002_review_elapsed_milliseconds",
+      "breakpoints": true
     }
   ]
 }

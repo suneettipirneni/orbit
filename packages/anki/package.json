@@ -16,19 +16,16 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "adm-zip": "0.5.17"
+    "adm-zip": "0.5.17",
+    "better-sqlite3": "12.11.1"
   },
   "devDependencies": {
     "@orbit/eslint-config": "workspace:*",
     "@types/adm-zip": "0.5.8",
     "@types/better-sqlite3": "7.6.13",
     "@types/node": "25.9.3",
-    "better-sqlite3": "12.11.1",
     "eslint": "10.5.0",
     "typescript": "6.0.3",
     "vitest": "4.1.9"
-  },
-  "peerDependencies": {
-    "better-sqlite3": "12.11.1"
   }
 }

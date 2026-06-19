@@ -3,12 +3,12 @@ import { spawn, spawnSync } from "node:child_process";
 const rendererUrl = "http://127.0.0.1:5173";
 const children = new Set();
 
-const prepare = spawnSync("pnpm", ["run", "prepare:native"], {
+const rebuild = spawnSync("pnpm", ["run", "rebuild:native"], {
   stdio: "inherit",
 });
 
-if (prepare.status !== 0) {
-  process.exit(prepare.status ?? 1);
+if (rebuild.status !== 0) {
+  process.exit(rebuild.status ?? 1);
 }
 
 const renderer = spawn(

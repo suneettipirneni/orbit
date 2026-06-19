@@ -17,6 +17,8 @@ import type {
   PaginationInput,
   ReviewRating,
   ReviewResult,
+  SchedulerStatus,
+  TodayStudySummary,
   UpdateCardInput,
   UpdateDeckInput,
   UpdateNoteInput,
@@ -50,7 +52,9 @@ export interface OrbitDesktopApi {
   };
   reviews: {
     listDue(input?: DueCardsInput): Promise<PaginatedResponse<CardWithNote>>;
+    schedulerStatus(): Promise<SchedulerStatus>;
     submit(cardId: string, rating: ReviewRating): Promise<ReviewResult>;
+    today(): Promise<TodayStudySummary>;
   };
 }
 

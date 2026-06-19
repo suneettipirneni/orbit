@@ -1,84 +1,88 @@
 import { eq } from "drizzle-orm";
 import type { CreateNoteInput, Note, UpdateNoteInput } from "@orbit/api";
-import type { RepoContext } from "./context.js";
+import type { OrbitDatabase } from "../database.js";
 import { cards } from "../schemas/card.js";
 import { notes } from "../schemas/note.js";
 import { nowIso } from "../time.js";
 
-export interface NoteRepo {
-  createNote(input: CreateNoteInput): Note;
-  deleteNote(noteId: string): void;
-  getNote(noteId: string): Note | undefined;
-  updateNote(noteId: string, input: UpdateNoteInput): Note | undefined;
+export function createNote(db: OrbitDatabase, input: CreateNoteInput): Note {
+  const timestamp = nowIso();
+  const note = {
+    back: input.back,
+    createdAt: timestamp,
+    deckId: input.deckId,
+    front: input.front,
+    id: crypto.randomUUID(),
+    updatedAt: timestamp,
+  };
+
+  db.insert(notes).values(note).run();
+  db.insert(cards)
+    .values({
+      createdAt: timestamp,
+      deckId: input.deckId,
+      dueAt: timestamp,
+      easeFactor: 2.5,
+      id: crypto.randomUUID(),
+      intervalDays: 0,
+      lapses: 0,
+      noteId: note.id,
+      repetitions: 0,
+      updatedAt: timestamp,
+    })
+    .run();
+
+  const created = db.select().from(notes).where(eq(notes.id, note.id)).get();
+
+  if (!created) {
+    throw new Error("Failed to create note.");
+  }
+
+  return created;
 }
 
-export function createNoteRepo({ handle }: RepoContext): NoteRepo {
-  const { db } = handle;
+export function deleteNote(db: OrbitDatabase, noteId: string): void {
+  db.delete(notes).where(eq(notes.id, noteId)).run();
+}
 
-  return {
-    createNote(input) {
-      const timestamp = nowIso();
-      const note = {
-        back: input.back,
-        createdAt: timestamp,
-        deckId: input.deckId,
-        front: input.front,
-        id: crypto.randomUUID(),
-        updatedAt: timestamp,
-      };
+export function getNote(db: OrbitDatabase, noteId: string): Note | undefined {
+  return db.select().from(notes).where(eq(notes.id, noteId)).get();
+}
 
-      db.insert(notes).values(note).run();
-      db.insert(cards)
-        .values({
-          createdAt: timestamp,
-          deckId: input.deckId,
-          dueAt: timestamp,
-          easeFactor: 2.5,
-          id: crypto.randomUUID(),
-          intervalDays: 0,
-          lapses: 0,
-          noteId: note.id,
-          repetitions: 0,
-          updatedAt: timestamp,
-        })
-        .run();
+export function updateNote(
+  db: OrbitDatabase,
+  noteId: string,
+  input: UpdateNoteInput,
+): Note | undefined {
+  const note = db.select().from(notes).where(eq(notes.id, noteId)).get();
 
-      const created = db.select().from(notes).where(eq(notes.id, note.id)).get();
+  if (!note) {
+    return undefined;
+  }
 
-      if (!created) {
-        throw new Error("Failed to create note.");
-      }
+  const ankiTags = updateTags(note.ankiTags, input);
 
-      return created;
-    },
-    deleteNote(noteId) {
-      db.delete(notes).where(eq(notes.id, noteId)).run();
-    },
-    getNote(noteId) {
-      return db.select().from(notes).where(eq(notes.id, noteId)).get();
-    },
-    updateNote(noteId, input) {
-      const note = db.select().from(notes).where(eq(notes.id, noteId)).get();
+  db.update(notes)
+    .set({
+      ankiTags,
+      back: input.back ?? note.back,
+      front: input.front ?? note.front,
+      updatedAt: nowIso(),
+    })
+    .where(eq(notes.id, noteId))
+    .run();
 
-      if (!note) {
-        return undefined;
-      }
+  if (input.buried || input.suspended) {
+    db.update(cards)
+      .set({
+        ankiQueue: input.suspended ? -1 : -2,
+        updatedAt: nowIso(),
+      })
+      .where(eq(cards.noteId, noteId))
+      .run();
+  }
 
-      const ankiTags = updateTags(note.ankiTags, input);
-
-      db.update(notes)
-        .set({
-          ankiTags,
-          back: input.back ?? note.back,
-          front: input.front ?? note.front,
-          updatedAt: nowIso(),
-        })
-        .where(eq(notes.id, noteId))
-        .run();
-
-      return db.select().from(notes).where(eq(notes.id, noteId)).get();
-    },
-  };
+  return db.select().from(notes).where(eq(notes.id, noteId)).get();
 }
 
 function normalizeTag(tag: string) {

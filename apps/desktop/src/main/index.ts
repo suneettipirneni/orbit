@@ -1,5 +1,4 @@
 import { app, BrowserWindow, net, protocol } from "electron";
-import { createDatabase, createRepositories, type DatabaseHandle } from "@orbit/db";
 import { existsSync, statSync } from "node:fs";
 import { join, normalize, relative } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -8,9 +7,10 @@ import {
   getDatabasePath,
   getMigrationsPath,
 } from "./lib/app-paths.js";
+import { createDesktopDatabase, type DesktopDatabase } from "./db/database.js";
 import { registerIpcHandlers } from "./ipc/index.js";
 
-let database: DatabaseHandle | undefined;
+let database: DesktopDatabase | undefined;
 
 protocol.registerSchemesAsPrivileged([
   {
@@ -89,13 +89,13 @@ void app
     registerRendererProtocol();
 
     const nativeBinding = getBetterSqliteNativeBindingPath();
-    process.env.ORBIT_BETTER_SQLITE3_NATIVE_BINDING = nativeBinding;
 
-    database = createDatabase(getDatabasePath(), {
+    database = createDesktopDatabase({
+      databasePath: getDatabasePath(),
       migrationsFolder: getMigrationsPath(),
       nativeBinding,
     });
-    registerIpcHandlers(createRepositories(database));
+    registerIpcHandlers(database.db, { nativeBinding: database.nativeBinding });
 
     await createWindow();
   })
@@ -111,7 +111,7 @@ app.on("activate", () => {
 });
 
 app.on("before-quit", () => {
-  database?.sqlite.close();
+  database?.close();
 });
 
 app.on("window-all-closed", () => {

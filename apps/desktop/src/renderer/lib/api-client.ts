@@ -55,6 +55,7 @@ async function routeRequest<TResponse>(
     return window.api.decks.listCards(segments[1], {
       ...paginationFromSearch(url.searchParams),
       query: url.searchParams.get("query") ?? undefined,
+      searchWithinFormatting: url.searchParams.get("searchWithinFormatting") === "true",
     }) as Promise<TResponse>;
   }
 
@@ -105,6 +106,14 @@ async function routeRequest<TResponse>(
       ...paginationFromSearch(url.searchParams),
       deckId: url.searchParams.get("deckId") ?? undefined,
     }) as Promise<TResponse>;
+  }
+
+  if (method === "GET" && segments[0] === "reviews" && segments[1] === "today") {
+    return window.api.reviews.today() as Promise<TResponse>;
+  }
+
+  if (method === "GET" && segments[0] === "reviews" && segments[1] === "scheduler-status") {
+    return window.api.reviews.schedulerStatus() as Promise<TResponse>;
   }
 
   if (method === "POST" && segments[0] === "reviews" && segments[1]) {

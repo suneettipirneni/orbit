@@ -10,6 +10,7 @@ import {
 
 export const reviewRatingSchema = z
   .object({
+    elapsedMilliseconds: z.int().min(0).optional(),
     value: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5)]),
   })
   .strict();
@@ -19,6 +20,15 @@ export type ReviewRating = z.infer<typeof reviewRatingSchema>;
 export interface ReviewResult {
   card: CardWithNote;
   nextDueAt: string;
+}
+
+export interface TodayStudySummary {
+  elapsedSeconds: number;
+  studiedCards: number;
+}
+
+export interface SchedulerStatus {
+  upgradeRequired: boolean;
 }
 
 export interface DueCardsInput extends PaginationInput {
@@ -35,6 +45,14 @@ export function listDueCards(client: ApiClient, input: DueCardsInput = {}) {
   return client.get<PaginatedResponse<CardWithNote>>(
     `/reviews/due${formatSearchParams(searchParams)}`,
   );
+}
+
+export function getTodayStudySummary(client: ApiClient) {
+  return client.get<TodayStudySummary>("/reviews/today");
+}
+
+export function getSchedulerStatus(client: ApiClient) {
+  return client.get<SchedulerStatus>("/reviews/scheduler-status");
 }
 
 export function submitReview(client: ApiClient, cardId: string, rating: ReviewRating) {
