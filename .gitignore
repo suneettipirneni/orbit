@@ -2,6 +2,7 @@ node_modules
 apps/desktop/.electron-native
 apps/desktop/.electron-gyp
 apps/desktop/.npm
+apps/desktop/.react-router
 dist
 out
 .turbo

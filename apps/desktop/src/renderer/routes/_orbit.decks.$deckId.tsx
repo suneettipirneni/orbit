@@ -27,7 +27,7 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
-import { Link, useParams } from "react-router";
+import { Link } from "react-router";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -57,12 +57,12 @@ import { useUpdateCardMutation } from "@/lib/mutations/card";
 import { useUpdateDeckMutation } from "@/lib/mutations/deck";
 import { useDeleteNoteMutation, useUpdateNoteMutation } from "@/lib/mutations/note";
 import { deckCardsQueryOptions, deckQueryOptions, decksQueryOptions } from "@/lib/queries/deck";
+import type { Route } from "./+types/_orbit.decks.$deckId";
 
-export function DeckDetailPage() {
+export default function DeckDetailPage({ params }: Route.ComponentProps) {
   "use no memo";
 
-  const { deckId } = useParams();
-  const resolvedDeckId = getDeckId(deckId);
+  const resolvedDeckId = params.deckId;
   const deck = useQuery(deckQueryOptions(resolvedDeckId));
   const decks = useQuery(decksQueryOptions({ pageSize: 100 }));
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -1317,12 +1317,4 @@ function CountCell({ label, value }: { label: string; value: number }) {
       <span className="text-xl font-semibold tabular-nums">{value}</span>
     </div>
   );
-}
-
-function getDeckId(deckId: string | undefined) {
-  if (!deckId) {
-    throw new Error("DeckDetailPage requires a deckId route param.");
-  }
-
-  return deckId;
 }

@@ -1,12 +1,9 @@
-import tailwindcss from "@tailwindcss/vite";
-import react from "@vitejs/plugin-react";
 import { defineConfig } from "electron-vite";
 import { copyFileSync, cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 
 const desktopRoot = import.meta.dirname;
 const dbMigrationsRoot = resolve(desktopRoot, "../../packages/db/src/migrations");
-const rendererRoot = resolve(desktopRoot, "src/renderer");
 
 export default defineConfig({
   main: {
@@ -58,37 +55,6 @@ export default defineConfig({
           format: "cjs",
         },
       },
-    },
-  },
-  renderer: {
-    base: "./",
-    build: {
-      outDir: resolve(desktopRoot, "out/renderer"),
-      rollupOptions: {
-        input: {
-          index: resolve(rendererRoot, "index.html"),
-        },
-      },
-    },
-    plugins: [
-      react({
-        babel: {
-          plugins: ["babel-plugin-react-compiler"],
-        },
-      }),
-      tailwindcss(),
-    ],
-    resolve: {
-      alias: {
-        "@": rendererRoot,
-        "@orbit/api": resolve(desktopRoot, "../../packages/api/src"),
-        "@orbit/ui": resolve(desktopRoot, "../../packages/ui/src"),
-      },
-    },
-    root: rendererRoot,
-    server: {
-      port: 5173,
-      strictPort: true,
     },
   },
 });
