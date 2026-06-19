@@ -77,8 +77,7 @@ function registerRendererProtocol() {
       !relativeCandidatePath.startsWith("/") &&
       existsSync(candidatePath) &&
       statSync(candidatePath).isFile();
-    const filePath =
-      isRendererFile ? candidatePath : indexPath;
+    const filePath = isRendererFile ? candidatePath : indexPath;
 
     return net.fetch(pathToFileURL(filePath).toString());
   });

@@ -20,9 +20,6 @@
     "@orbit/api": "workspace:*",
     "drizzle-orm": "0.45.2"
   },
-  "peerDependencies": {
-    "better-sqlite3": "12.11.1"
-  },
   "devDependencies": {
     "@orbit/eslint-config": "workspace:*",
     "@types/better-sqlite3": "7.6.13",
@@ -31,5 +28,8 @@
     "eslint": "10.5.0",
     "typescript": "6.0.3",
     "vitest": "4.1.9"
+  },
+  "peerDependencies": {
+    "better-sqlite3": "12.11.1"
   }
 }

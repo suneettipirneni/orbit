@@ -18,9 +18,6 @@
   "dependencies": {
     "adm-zip": "0.5.17"
   },
-  "peerDependencies": {
-    "better-sqlite3": "12.11.1"
-  },
   "devDependencies": {
     "@orbit/eslint-config": "workspace:*",
     "@types/adm-zip": "0.5.8",
@@ -30,5 +27,8 @@
     "eslint": "10.5.0",
     "typescript": "6.0.3",
     "vitest": "4.1.9"
+  },
+  "peerDependencies": {
+    "better-sqlite3": "12.11.1"
   }
 }
