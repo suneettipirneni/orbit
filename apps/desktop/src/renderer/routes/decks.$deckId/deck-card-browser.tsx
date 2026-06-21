@@ -35,7 +35,14 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Button } from "@orbit/ui/components/button";
-import { DataTable } from "@orbit/ui/components/data-table";
+import {
+  DataTableColumnVisibility,
+  DataTableContent,
+  DataTablePagination,
+  DataTableRoot,
+  DataTableSelection,
+  DataTableToolbar,
+} from "@orbit/ui/components/data-table";
 import { Separator } from "@orbit/ui/components/separator";
 import { ToggleGroup, ToggleGroupItem } from "@orbit/ui/components/toggle-group";
 import { loadAnkiPreferences, normalizeTextForAccentPreference } from "@/lib/anki-preferences";
@@ -683,406 +690,405 @@ export function DeckCardBrowser({ deckId }: DeckCardBrowserProps) {
               ref={cardListRef}
               tabIndex={-1}
             >
-              <DataTable
+              <DataTableRoot
                 className="min-h-full min-w-0 [&_td:nth-child(2)]:whitespace-normal"
-                columnVisibility
-                emptyMessage={isDeckCardsLoading ? "Loading cards..." : "No cards yet."}
-                pagination={{
-                  showSelectedCount: true,
-                  totalRows: browserTotalRowCount,
-                }}
-                selection
                 table={table}
-                toolbar={
-                  <>
-                    <ToggleGroup
-                      aria-label="Browser display mode"
-                      onValueChange={(value) => {
-                        if (value === "cards" || value === "notes") {
-                          setDisplayMode(value);
-                          setRowSelection({});
-                        }
-                      }}
-                      size="sm"
-                      spacing={0}
-                      type="single"
-                      value={displayMode}
-                      variant="outline"
-                    >
-                      <ToggleGroupItem aria-label="Card rows" value="cards">
-                        <CreditCard className="size-4" />
-                        Cards
-                      </ToggleGroupItem>
-                      <ToggleGroupItem aria-label="Note rows" value="notes">
-                        <NotebookTabs className="size-4" />
-                        Notes
-                      </ToggleGroupItem>
-                    </ToggleGroup>
-                    <ToggleGroup
-                      aria-label="Browser layout"
-                      onValueChange={(value) => {
-                        if (value === "auto" || value === "vertical" || value === "horizontal") {
-                          setBrowserLayoutMode(value);
-                        }
-                      }}
-                      size="sm"
-                      spacing={0}
-                      type="single"
-                      value={browserLayoutMode}
-                      variant="outline"
-                    >
-                      <ToggleGroupItem aria-label="Layout auto" value="auto">
-                        <Table className="size-4" />
-                      </ToggleGroupItem>
-                      <ToggleGroupItem aria-label="Layout vertical" value="vertical">
-                        <ListChecks className="size-4" />
-                      </ToggleGroupItem>
-                      <ToggleGroupItem aria-label="Layout horizontal" value="horizontal">
-                        <NotebookTabs className="size-4" />
-                      </ToggleGroupItem>
-                    </ToggleGroup>
-                    <Button
-                      aria-label="Add note from browser"
-                      onClick={openBrowserAddNote}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <FileText className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Create copy from browser"
-                      disabled={!selectedCard}
-                      onClick={createBrowserCopy}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <Copy className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Delete selected notes"
-                      disabled={selectedOrCurrentNoteIds.length === 0}
-                      onClick={() => setIsDeleteSelectedNotesOpen(true)}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <X className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Grade now"
-                      disabled={selectedOrCurrentCardIds.length === 0 || isReviewing}
-                      onClick={gradeSelectedCardsNow}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <Play className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Clear unused tags"
-                      onClick={clearUnusedBrowserTags}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <ArchiveRestore className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Change note type"
-                      disabled={selectedOrCurrentNoteIds.length === 0}
-                      onClick={() => setIsChangeNoteTypeOpen(true)}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
+              >
+                <DataTableToolbar>
+                  <ToggleGroup
+                    aria-label="Browser display mode"
+                    onValueChange={(value) => {
+                      if (value === "cards" || value === "notes") {
+                        setDisplayMode(value);
+                        setRowSelection({});
+                      }
+                    }}
+                    size="sm"
+                    spacing={0}
+                    type="single"
+                    value={displayMode}
+                    variant="outline"
+                  >
+                    <ToggleGroupItem aria-label="Card rows" value="cards">
+                      <CreditCard className="size-4" />
+                      Cards
+                    </ToggleGroupItem>
+                    <ToggleGroupItem aria-label="Note rows" value="notes">
                       <NotebookTabs className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Find duplicates"
-                      onClick={() => setIsFindDuplicatesOpen(true)}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <Search className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Find and replace"
-                      disabled={selectedOrCurrentNoteIds.length === 0}
-                      onClick={() => setIsFindReplaceOpen(true)}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <Pencil className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Export notes"
-                      onClick={openExportNotesWorkflow}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <FileText className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Create filtered deck"
-                      onClick={openCreateFilteredDeckWorkflow}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <Target className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Browser settings"
-                      onClick={openBrowserOptions}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <Settings className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Undo browser change"
-                      disabled={browserUndoStack.length === 0 || isUpdatingNote}
-                      onClick={undoBrowserChange}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <Undo2 className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Redo browser change"
-                      disabled={browserRedoStack.length === 0 || isUpdatingNote}
-                      onClick={redoBrowserChange}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <RotateCcw className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Full screen browser"
-                      onClick={() => setIsBrowserFullScreen((current) => !current)}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
+                      Notes
+                    </ToggleGroupItem>
+                  </ToggleGroup>
+                  <ToggleGroup
+                    aria-label="Browser layout"
+                    onValueChange={(value) => {
+                      if (value === "auto" || value === "vertical" || value === "horizontal") {
+                        setBrowserLayoutMode(value);
+                      }
+                    }}
+                    size="sm"
+                    spacing={0}
+                    type="single"
+                    value={browserLayoutMode}
+                    variant="outline"
+                  >
+                    <ToggleGroupItem aria-label="Layout auto" value="auto">
                       <Table className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Close browser"
-                      onClick={closeBrowser}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <X className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Zoom out"
-                      disabled={browserZoom <= 0.8}
-                      onClick={zoomBrowserOut}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <ZoomOut className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Reset zoom"
-                      disabled={browserZoom === 1}
-                      onClick={resetBrowserZoom}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <RotateCcw className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Zoom in"
-                      disabled={browserZoom >= 1.4}
-                      onClick={zoomBrowserIn}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <ZoomIn className="size-4" />
-                    </Button>
-                    <Button
-                      disabled={browserRows.length === 0}
-                      onClick={() => {
-                        setRowSelection(
-                          Object.fromEntries(
-                            browserRows
-                              .filter((card) => !rowSelection[card.id])
-                              .map((card) => [card.id, true]),
-                          ),
-                        );
-                      }}
-                      size="sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <Shuffle className="size-4" />
-                      Invert selection
-                    </Button>
-                    <Button
-                      disabled={!hasSelectedRows}
-                      onClick={() => {
-                        const selectedNoteIds = new Set(
+                    </ToggleGroupItem>
+                    <ToggleGroupItem aria-label="Layout vertical" value="vertical">
+                      <ListChecks className="size-4" />
+                    </ToggleGroupItem>
+                    <ToggleGroupItem aria-label="Layout horizontal" value="horizontal">
+                      <NotebookTabs className="size-4" />
+                    </ToggleGroupItem>
+                  </ToggleGroup>
+                  <Button
+                    aria-label="Add note from browser"
+                    onClick={openBrowserAddNote}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <FileText className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Create copy from browser"
+                    disabled={!selectedCard}
+                    onClick={createBrowserCopy}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <Copy className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Delete selected notes"
+                    disabled={selectedOrCurrentNoteIds.length === 0}
+                    onClick={() => setIsDeleteSelectedNotesOpen(true)}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <X className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Grade now"
+                    disabled={selectedOrCurrentCardIds.length === 0 || isReviewing}
+                    onClick={gradeSelectedCardsNow}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <Play className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Clear unused tags"
+                    onClick={clearUnusedBrowserTags}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <ArchiveRestore className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Change note type"
+                    disabled={selectedOrCurrentNoteIds.length === 0}
+                    onClick={() => setIsChangeNoteTypeOpen(true)}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <NotebookTabs className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Find duplicates"
+                    onClick={() => setIsFindDuplicatesOpen(true)}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <Search className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Find and replace"
+                    disabled={selectedOrCurrentNoteIds.length === 0}
+                    onClick={() => setIsFindReplaceOpen(true)}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <Pencil className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Export notes"
+                    onClick={openExportNotesWorkflow}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <FileText className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Create filtered deck"
+                    onClick={openCreateFilteredDeckWorkflow}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <Target className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Browser settings"
+                    onClick={openBrowserOptions}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <Settings className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Undo browser change"
+                    disabled={browserUndoStack.length === 0 || isUpdatingNote}
+                    onClick={undoBrowserChange}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <Undo2 className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Redo browser change"
+                    disabled={browserRedoStack.length === 0 || isUpdatingNote}
+                    onClick={redoBrowserChange}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <RotateCcw className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Full screen browser"
+                    onClick={() => setIsBrowserFullScreen((current) => !current)}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <Table className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Close browser"
+                    onClick={closeBrowser}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <X className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Zoom out"
+                    disabled={browserZoom <= 0.8}
+                    onClick={zoomBrowserOut}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <ZoomOut className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Reset zoom"
+                    disabled={browserZoom === 1}
+                    onClick={resetBrowserZoom}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <RotateCcw className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Zoom in"
+                    disabled={browserZoom >= 1.4}
+                    onClick={zoomBrowserIn}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <ZoomIn className="size-4" />
+                  </Button>
+                  <Button
+                    disabled={browserRows.length === 0}
+                    onClick={() => {
+                      setRowSelection(
+                        Object.fromEntries(
                           browserRows
-                            .filter((card) => rowSelection[card.id])
-                            .map((card) => card.noteId),
-                        );
+                            .filter((card) => !rowSelection[card.id])
+                            .map((card) => [card.id, true]),
+                        ),
+                      );
+                    }}
+                    size="sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <Shuffle className="size-4" />
+                    Invert selection
+                  </Button>
+                  <Button
+                    disabled={!hasSelectedRows}
+                    onClick={() => {
+                      const selectedNoteIds = new Set(
+                        browserRows
+                          .filter((card) => rowSelection[card.id])
+                          .map((card) => card.noteId),
+                      );
 
-                        setRowSelection(
-                          Object.fromEntries(
-                            browserRows
-                              .filter((card) => selectedNoteIds.has(card.noteId))
-                              .map((card) => [card.id, true]),
-                          ),
-                        );
-                      }}
-                      size="sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <ListChecks className="size-4" />
-                      Select notes
-                    </Button>
-                    <Button
-                      aria-label="Find/search focus"
-                      onClick={focusSearch}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <Search className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Filter focus"
-                      onClick={focusSidebarFilter}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <Search className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Sidebar focus"
-                      onClick={focusSidebar}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <ListChecks className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Toggle sidebar"
-                      onClick={() => setIsSidebarVisible((visible) => !visible)}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <NotebookTabs className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Note focus"
-                      disabled={!selectedCard}
-                      onClick={focusNoteEditor}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <FileText className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Card list focus"
-                      onClick={focusCardList}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <Table className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Preview selected card"
-                      disabled={!selectedCard}
-                      onClick={() => setIsPreviewOpen(true)}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <Eye className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Card info"
-                      disabled={!selectedCard}
-                      onClick={() => setIsCardInfoOpen(true)}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <Info className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="First card"
-                      disabled={browserRows.length === 0 || selectedRowIndex <= 0}
-                      onClick={() => selectRowAt(0)}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <ChevronsLeft className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Previous card"
-                      disabled={browserRows.length === 0 || selectedRowIndex <= 0}
-                      onClick={() => selectRowAt(Math.max(0, selectedRowIndex - 1))}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <ChevronLeft className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Next card"
-                      disabled={
-                        browserRows.length === 0 ||
-                        selectedRowIndex === -1 ||
-                        selectedRowIndex >= browserRows.length - 1
-                      }
-                      onClick={() =>
-                        selectRowAt(Math.min(browserRows.length - 1, selectedRowIndex + 1))
-                      }
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <ChevronRight className="size-4" />
-                    </Button>
-                    <Button
-                      aria-label="Last card"
-                      disabled={
-                        browserRows.length === 0 ||
-                        selectedRowIndex === -1 ||
-                        selectedRowIndex >= browserRows.length - 1
-                      }
-                      onClick={() => selectRowAt(browserRows.length - 1)}
-                      size="icon-sm"
-                      type="button"
-                      variant="outline"
-                    >
-                      <ChevronsRight className="size-4" />
-                    </Button>
-                  </>
-                }
-              />
+                      setRowSelection(
+                        Object.fromEntries(
+                          browserRows
+                            .filter((card) => selectedNoteIds.has(card.noteId))
+                            .map((card) => [card.id, true]),
+                        ),
+                      );
+                    }}
+                    size="sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <ListChecks className="size-4" />
+                    Select notes
+                  </Button>
+                  <Button
+                    aria-label="Find/search focus"
+                    onClick={focusSearch}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <Search className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Filter focus"
+                    onClick={focusSidebarFilter}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <Search className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Sidebar focus"
+                    onClick={focusSidebar}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <ListChecks className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Toggle sidebar"
+                    onClick={() => setIsSidebarVisible((visible) => !visible)}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <NotebookTabs className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Note focus"
+                    disabled={!selectedCard}
+                    onClick={focusNoteEditor}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <FileText className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Card list focus"
+                    onClick={focusCardList}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <Table className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Preview selected card"
+                    disabled={!selectedCard}
+                    onClick={() => setIsPreviewOpen(true)}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <Eye className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Card info"
+                    disabled={!selectedCard}
+                    onClick={() => setIsCardInfoOpen(true)}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <Info className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="First card"
+                    disabled={browserRows.length === 0 || selectedRowIndex <= 0}
+                    onClick={() => selectRowAt(0)}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <ChevronsLeft className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Previous card"
+                    disabled={browserRows.length === 0 || selectedRowIndex <= 0}
+                    onClick={() => selectRowAt(Math.max(0, selectedRowIndex - 1))}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <ChevronLeft className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Next card"
+                    disabled={
+                      browserRows.length === 0 ||
+                      selectedRowIndex === -1 ||
+                      selectedRowIndex >= browserRows.length - 1
+                    }
+                    onClick={() =>
+                      selectRowAt(Math.min(browserRows.length - 1, selectedRowIndex + 1))
+                    }
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <ChevronRight className="size-4" />
+                  </Button>
+                  <Button
+                    aria-label="Last card"
+                    disabled={
+                      browserRows.length === 0 ||
+                      selectedRowIndex === -1 ||
+                      selectedRowIndex >= browserRows.length - 1
+                    }
+                    onClick={() => selectRowAt(browserRows.length - 1)}
+                    size="icon-sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    <ChevronsRight className="size-4" />
+                  </Button>
+                  <DataTableColumnVisibility />
+                </DataTableToolbar>
+                <DataTableSelection>
+                  <DataTableContent
+                    emptyMessage={isDeckCardsLoading ? "Loading cards..." : "No cards yet."}
+                  />
+                </DataTableSelection>
+                <DataTablePagination showSelectedCount totalRows={browserTotalRowCount} />
+              </DataTableRoot>
             </section>
             <SelectedNoteEditor
               key={selectedCard?.id ?? "empty"}

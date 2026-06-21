@@ -1,4 +1,3 @@
-import type { CardPreview } from "@orbit/types";
 import { Play } from "lucide-react";
 import { Link } from "react-router";
 import {
@@ -12,22 +11,14 @@ import {
 import { Button } from "@orbit/ui/components/button";
 import { Separator } from "@orbit/ui/components/separator";
 import { SidebarTrigger } from "@orbit/ui/components/sidebar";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@orbit/ui/components/table";
 import { PageLayout, PageLayoutContent, PageLayoutHeader } from "@/components/layout/page";
-import { formatDueDate } from "@/lib/date-format";
 import { useDeckCardsQuery, useDeckQuery } from "@/lib/queries/deck";
 import { DeckDetails } from "./deck-details";
+import { DeckCards } from "./deck-cards";
 
 export function DeckDetailWorkspace({ deckId }: { deckId: string }) {
   const { data: deck } = useDeckQuery(deckId);
-  const { data: [deckCardsPage] = [], isLoading: isDeckCardsLoading } = useDeckCardsQuery(deckId, {
+  const { data: [deckCardsPage] = [] } = useDeckCardsQuery(deckId, {
     pageSize: 100,
   });
 
@@ -81,54 +72,9 @@ export function DeckDetailWorkspace({ deckId }: { deckId: string }) {
               </p>
             </div>
           </div>
-          <DeckCardTable cards={deckCardsPage?.data ?? []} isLoading={isDeckCardsLoading} />
+          <DeckCards deckId={deckId} />
         </section>
       </PageLayoutContent>
     </PageLayout>
-  );
-}
-
-function DeckCardTable({ cards, isLoading }: { cards: CardPreview[]; isLoading: boolean }) {
-  return (
-    <div className="min-h-0 overflow-hidden rounded-md border border-border bg-card">
-      <div className="max-h-[min(36rem,calc(100vh-18rem))] overflow-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Front</TableHead>
-              <TableHead>Back</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Due</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {cards.length > 0 ? (
-              cards.map((card) => (
-                <TableRow key={card.id}>
-                  <TableCell className="max-w-[22rem] align-top">
-                    <p className="line-clamp-2 font-medium">{card.front}</p>
-                  </TableCell>
-                  <TableCell className="max-w-[28rem] align-top text-muted-foreground">
-                    <p className="line-clamp-2">{card.back}</p>
-                  </TableCell>
-                  <TableCell className="align-top">
-                    {card.ankiCardType ?? <span className="text-muted-foreground">-</span>}
-                  </TableCell>
-                  <TableCell className="align-top text-muted-foreground">
-                    {formatDueDate(card.dueAt)}
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell className="h-24 text-center text-muted-foreground" colSpan={4}>
-                  {isLoading ? "Loading cards..." : "No cards in this deck."}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-    </div>
   );
 }
