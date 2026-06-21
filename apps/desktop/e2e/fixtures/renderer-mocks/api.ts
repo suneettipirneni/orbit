@@ -34,10 +34,7 @@ export interface E2eRendererApi {
     get(deckId: string): Promise<DeckDetail>;
     importAnki(input: ImportAnkiDecksInput): Promise<ImportAnkiDecksResult>;
     list(input?: PaginationInput): Promise<PaginatedResponse<DeckSummary>>;
-    listCards(
-      deckId: string,
-      input?: ListDeckCardsInput,
-    ): Promise<PaginatedResponse<CardPreview>>;
+    listCards(deckId: string, input?: ListDeckCardsInput): Promise<PaginatedResponse<CardPreview>>;
     update(deckId: string, input: UpdateDeckInput): Promise<Deck>;
   };
   notes: {

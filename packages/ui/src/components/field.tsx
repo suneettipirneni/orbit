@@ -174,19 +174,15 @@ function FieldError({
   const uniqueErrors = errors?.length
     ? [...new Map(errors.map((error) => [error?.message, error])).values()]
     : [];
-  const content = children
-    ? children
-    : uniqueErrors.length === 0
-      ? null
-      : uniqueErrors.length === 1
-        ? uniqueErrors[0]?.message
-        : (
-          <ul className="ml-4 flex list-disc flex-col gap-1">
-            {uniqueErrors.map(
-              (error, index) => error?.message && <li key={index}>{error.message}</li>,
-            )}
-          </ul>
-        );
+  const content = children ? (
+    children
+  ) : uniqueErrors.length === 0 ? null : uniqueErrors.length === 1 ? (
+    uniqueErrors[0]?.message
+  ) : (
+    <ul className="ml-4 flex list-disc flex-col gap-1">
+      {uniqueErrors.map((error, index) => error?.message && <li key={index}>{error.message}</li>)}
+    </ul>
+  );
 
   if (!content) {
     return null;
