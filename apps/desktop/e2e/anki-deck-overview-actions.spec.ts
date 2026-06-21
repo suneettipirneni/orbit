@@ -1,13 +1,10 @@
 import { expect, test } from "@playwright/test";
 import { mockOrbitApi } from "./fixtures/orbit-api";
 
-test.beforeEach(async ({ page }) => {
-  await mockOrbitApi(page, { includeBuriedCards: true });
-});
-
 test("ANKI-DECK-OVERVIEW-007 ANKI-DECK-OVERVIEW-008 ANKI-DECK-OVERVIEW-009 ANKI-DECK-OVERVIEW-010: deck overview opens deck actions and asks which buried cards to unbury", async ({
   page,
 }) => {
+  await mockOrbitApi(page, { includeBuriedCards: true });
   await page.goto("/decks/deck-1");
 
   await page.getByRole("button", { name: "Options" }).click();
@@ -27,4 +24,17 @@ test("ANKI-DECK-OVERVIEW-007 ANKI-DECK-OVERVIEW-008 ANKI-DECK-OVERVIEW-009 ANKI-
   await expect(
     unburyDialog.getByRole("button", { name: "Scheduler-buried siblings" }),
   ).toBeVisible();
+});
+
+test("ANKI-DECK-OVERVIEW-011: filtered deck overview shows rebuild and empty actions instead of custom study", async ({
+  page,
+}) => {
+  await mockOrbitApi(page, { includeFilteredDeck: true });
+  await page.goto("/decks/deck-filtered");
+
+  await expect(page.getByRole("heading", { level: 1, name: "Filtered Review" })).toBeVisible();
+  await expect(page.getByText("cards return to their original decks")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Rebuild" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Empty" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Custom Study" })).toBeHidden();
 });

@@ -11,12 +11,14 @@ export interface MockOrbitApiOptions {
     front: string;
     id: string;
     noteId?: string;
+    noteTags?: string[];
     repetitions?: number;
   }>;
   description?: string | null;
   includeBuriedCards?: boolean;
   includeDragTargetDeck?: boolean;
   importDelayMs?: number;
+  includeFilteredDeck?: boolean;
   noDueCards?: boolean;
   requiresSchedulerUpgrade?: boolean;
   reviewQueue?: Array<{
@@ -33,6 +35,20 @@ export interface MockOrbitApiOptions {
     elapsedSeconds: number;
     studiedCards: number;
   };
+}
+
+interface MockDeckSummary {
+  createdAt: string;
+  description: string | null;
+  dueCards: number;
+  id: string;
+  isFiltered?: boolean;
+  learningCards: number;
+  name: string;
+  newCards: number;
+  reviewCards: number;
+  totalCards: number;
+  updatedAt: string;
 }
 
 export async function mockOrbitApi(page: Page, options: MockOrbitApiOptions = {}) {
@@ -79,7 +95,7 @@ export async function mockOrbitApi(page: Page, options: MockOrbitApiOptions = {}
       }
     ).__orbitReviewSubmissions = [];
     const activeDueCardCount = activeReviewQueue.length;
-    const decks = [
+    const decks: MockDeckSummary[] = [
       {
         createdAt: now,
         description,
@@ -117,6 +133,22 @@ export async function mockOrbitApi(page: Page, options: MockOrbitApiOptions = {}
         newCards: 0,
         reviewCards: 0,
         totalCards: 0,
+        updatedAt: now,
+      });
+    }
+
+    if (mockOptions.includeFilteredDeck) {
+      decks.push({
+        createdAt: now,
+        description: "Filtered deck",
+        dueCards: 2,
+        id: "deck-filtered",
+        isFiltered: true,
+        learningCards: 0,
+        name: "Filtered Review",
+        newCards: 1,
+        reviewCards: 1,
+        totalCards: 2,
         updatedAt: now,
       });
     }
@@ -174,7 +206,7 @@ export async function mockOrbitApi(page: Page, options: MockOrbitApiOptions = {}
           ankiOrder: index,
           ankiQueue: card.repetitions && card.repetitions > 0 ? 2 : 0,
           ankiSortField: card.front,
-          ankiTags: [],
+          ankiTags: card.noteTags ?? [],
           ankiType: card.repetitions && card.repetitions > 0 ? 2 : 0,
           back: card.back,
           cardTypeId: "card-type-1",
@@ -387,6 +419,7 @@ export async function mockOrbitApi(page: Page, options: MockOrbitApiOptions = {}
               createdAt: deck.createdAt,
               description: deck.description,
               id: deck.id,
+              isFiltered: deck.isFiltered,
               name: deck.name,
               updatedAt: deck.updatedAt,
             },

@@ -1,50 +1,32 @@
+import type { ListDeckCardsInput, PaginationInput } from "@orbit/types";
+import { toCompilableQuery } from "@powersync/drizzle-driver";
+import { useQuery as usePowerSyncQuery } from "@powersync/react";
 import {
-  getDeck,
-  listDeckCards,
-  listDecks,
-  type ListDeckCardsInput,
-  type PaginationInput,
-} from "@orbit/api";
-import { keepPreviousData, queryOptions } from "@tanstack/react-query";
-import { apiClient } from "@/lib/api-client";
+  allDecksCardScope,
+  deckCardsQuery,
+  deckDetailQuery,
+  decksListQuery,
+} from "@/lib/repo/deck";
 
-export const deckQueryKeys = {
-  all: ["decks"] as const,
-  cards: (deckId: string, input: ListDeckCardsInput = {}) =>
-    [
-      ...deckQueryKeys.cardsLists(deckId),
-      input.page ?? 1,
-      input.pageSize ?? 50,
-      input.query ?? "",
-      input.searchWithinFormatting ?? false,
-    ] as const,
-  cardsLists: (deckId: string) => [...deckQueryKeys.detail(deckId), "cards"] as const,
-  detail: (deckId: string) => [...deckQueryKeys.all, deckId] as const,
-  list: (input: PaginationInput = {}) =>
-    [...deckQueryKeys.lists(), input.page ?? 1, input.pageSize ?? 50] as const,
-  lists: () => [...deckQueryKeys.all, "list"] as const,
-};
+export { allDecksCardScope };
 
-export function decksQueryOptions(input: PaginationInput = {}) {
-  return queryOptions({
-    queryFn: () => listDecks(apiClient, input),
-    queryKey: deckQueryKeys.list(input),
-  });
+export function useDecksQuery(input: PaginationInput = {}) {
+  return usePowerSyncQuery(toCompilableQuery(decksListQuery(input)));
 }
 
-export function deckCardsQueryOptions(deckId: string, input: ListDeckCardsInput = {}) {
-  return queryOptions({
-    enabled: Boolean(deckId),
-    placeholderData: keepPreviousData,
-    queryFn: () => listDeckCards(apiClient, deckId, input),
-    queryKey: deckQueryKeys.cards(deckId, input),
-  });
+export function useDeckQuery(deckId: string) {
+  const {
+    data: [deck],
+    ...query
+  } = usePowerSyncQuery(toCompilableQuery(deckDetailQuery(deckId)));
+
+  return { ...query, data: deck };
 }
 
-export function deckQueryOptions(deckId: string) {
-  return queryOptions({
-    enabled: Boolean(deckId),
-    queryFn: () => getDeck(apiClient, deckId),
-    queryKey: deckQueryKeys.detail(deckId),
-  });
+export function useDeckCardsQuery(deckId: string, input: ListDeckCardsInput = {}) {
+  return usePowerSyncQuery(toCompilableQuery(deckCardsQuery(deckId, input)));
+}
+
+export function useCollectionCardsQuery(input: ListDeckCardsInput = {}) {
+  return useDeckCardsQuery(allDecksCardScope, input);
 }

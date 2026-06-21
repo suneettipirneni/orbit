@@ -1,6 +1,6 @@
 import "./styles.css";
-import { QueryClientProvider } from "@tanstack/react-query";
-import type { ReactNode } from "react";
+import { PowerSyncContext } from "@powersync/react";
+import { useEffect, type ReactNode } from "react";
 import {
   isRouteErrorResponse,
   Links,
@@ -8,9 +8,14 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useMatch,
+  useNavigate,
 } from "react-router";
+import { SidebarInset, SidebarProvider } from "@orbit/ui/components/sidebar";
+import { TooltipProvider } from "@orbit/ui/components/tooltip";
 import type { Route } from "./+types/root";
-import { queryClient } from "@/lib/query-client";
+import { DeckList } from "./deck-list";
+import { connectPowerSync, powerSync } from "@/lib/powersync";
 
 export function Layout({ children }: { children: ReactNode }) {
   return (
@@ -32,10 +37,31 @@ export function Layout({ children }: { children: ReactNode }) {
 }
 
 export default function Root() {
+  const navigate = useNavigate();
+  const nestedDeckRoute = useMatch("/decks/:deckId/*");
+  const deckRoute = useMatch("/decks/:deckId");
+  const activeDeckRoute = nestedDeckRoute ?? deckRoute;
+  const isElectron = typeof navigator !== "undefined" && navigator.userAgent.includes("Electron/");
+  useEffect(() => {
+    void connectPowerSync();
+  }, []);
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <Outlet />
-    </QueryClientProvider>
+    <PowerSyncContext.Provider value={powerSync}>
+      <TooltipProvider>
+        <SidebarProvider className={isElectron ? "electron-window" : undefined}>
+          <DeckList
+            onSelectDeck={(selectedDeckId) => {
+              void navigate(`/decks/${selectedDeckId}`);
+            }}
+            selectedDeckId={activeDeckRoute?.params.deckId}
+          />
+          <SidebarInset>
+            <Outlet />
+          </SidebarInset>
+        </SidebarProvider>
+      </TooltipProvider>
+    </PowerSyncContext.Provider>
   );
 }
 

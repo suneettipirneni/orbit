@@ -6,6 +6,12 @@ export default [
     ignores: [".react-router/**", "out/**", "scripts/**"],
   },
   {
+    files: ["src/renderer/routes/**"],
+    rules: {
+      "unicorn/filename-case": "off",
+    },
+  },
+  {
     languageOptions: {
       parserOptions: {
         projectService: {

@@ -11,7 +11,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": rendererRoot,
-      "@orbit/api": resolve(desktopRoot, "../../packages/api/src"),
+      "@orbit/types": resolve(desktopRoot, "../../packages/types/src"),
       "@orbit/ui": resolve(desktopRoot, "../../packages/ui/src"),
     },
   },

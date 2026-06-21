@@ -2,15 +2,8 @@ import { app, BrowserWindow, net, protocol } from "electron";
 import { existsSync, statSync } from "node:fs";
 import { join, normalize, relative } from "node:path";
 import { pathToFileURL } from "node:url";
-import {
-  getBetterSqliteNativeBindingPath,
-  getDatabasePath,
-  getMigrationsPath,
-} from "./lib/app-paths.js";
-import { createDesktopDatabase, type DesktopDatabase } from "./db/database.js";
+import { getBetterSqliteNativeBindingPath } from "./lib/app-paths.js";
 import { registerIpcHandlers } from "./ipc/index.js";
-
-let database: DesktopDatabase | undefined;
 
 protocol.registerSchemesAsPrivileged([
   {
@@ -90,12 +83,7 @@ void app
 
     const nativeBinding = getBetterSqliteNativeBindingPath();
 
-    database = createDesktopDatabase({
-      databasePath: getDatabasePath(),
-      migrationsFolder: getMigrationsPath(),
-      nativeBinding,
-    });
-    registerIpcHandlers(database.db, { nativeBinding: database.nativeBinding });
+    registerIpcHandlers({ nativeBinding });
 
     await createWindow();
   })
@@ -108,10 +96,6 @@ app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     void createWindow();
   }
-});
-
-app.on("before-quit", () => {
-  database?.close();
 });
 
 app.on("window-all-closed", () => {

@@ -1,43 +1,31 @@
-import {
-  getSchedulerStatus,
-  getTodayStudySummary,
-  listDueCards,
-  type DueCardsInput,
-} from "@orbit/api";
-import { queryOptions } from "@tanstack/react-query";
-import { apiClient } from "@/lib/api-client";
+import type { DueCardsInput, SchedulerStatus } from "@orbit/types";
+import { toCompilableQuery } from "@powersync/drizzle-driver";
+import { useQuery as usePowerSyncQuery } from "@powersync/react";
+import { dueCardsQuery, getSchedulerStatus, todayStudySummaryQuery } from "@/lib/repo/review";
 
-export const reviewQueryKeys = {
-  all: ["reviews"] as const,
-  due: (input: DueCardsInput = {}) =>
-    [
-      ...reviewQueryKeys.dueLists(),
-      input.deckId ?? "all",
-      input.page ?? 1,
-      input.pageSize ?? 50,
-    ] as const,
-  dueLists: () => [...reviewQueryKeys.all, "due"] as const,
-  schedulerStatus: () => [...reviewQueryKeys.all, "scheduler-status"] as const,
-  today: () => [...reviewQueryKeys.all, "today"] as const,
-};
-
-export function dueCardsQueryOptions(input: DueCardsInput = {}) {
-  return queryOptions({
-    queryFn: () => listDueCards(apiClient, input),
-    queryKey: reviewQueryKeys.due(input),
-  });
+export function useDueCardsQuery(input: DueCardsInput = {}) {
+  return usePowerSyncQuery(toCompilableQuery(dueCardsQuery(input)));
 }
 
-export function todayStudySummaryQueryOptions() {
-  return queryOptions({
-    queryFn: () => getTodayStudySummary(apiClient),
-    queryKey: reviewQueryKeys.today(),
-  });
+export function useTodayStudySummaryQuery() {
+  const {
+    data: [summary],
+    ...query
+  } = usePowerSyncQuery(toCompilableQuery(todayStudySummaryQuery()));
+
+  return { ...query, data: summary };
 }
 
-export function schedulerStatusQueryOptions() {
-  return queryOptions({
-    queryFn: () => getSchedulerStatus(apiClient),
-    queryKey: reviewQueryKeys.schedulerStatus(),
-  });
+export function useSchedulerStatusQuery() {
+  return {
+    data: getSchedulerStatus(),
+    error: undefined,
+    isFetching: false,
+    isLoading: false,
+  } satisfies {
+    data: SchedulerStatus;
+    error: undefined;
+    isFetching: boolean;
+    isLoading: boolean;
+  };
 }

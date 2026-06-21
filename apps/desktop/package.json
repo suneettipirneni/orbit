@@ -10,19 +10,20 @@
     "lint": "react-router typegen && eslint .",
     "rebuild:native": "electron-rebuild -f -w better-sqlite3",
     "start": "electron-vite preview --config electron.vite.config.ts",
-    "test": "vitest run --passWithNoTests --exclude=\"dist/**\" --exclude=\"e2e/**\"",
+    "test": "env ELECTRON_RUN_AS_NODE=1 electron ./node_modules/vitest/vitest.mjs run --passWithNoTests --exclude=\"dist/**\" --exclude=\"e2e/**\"",
     "test:e2e": "playwright test",
     "typecheck": "react-router typegen && tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@orbit/anki": "workspace:*",
-    "@orbit/api": "workspace:*",
-    "@orbit/db": "workspace:*",
+    "@orbit/types": "workspace:*",
     "@orbit/ui": "workspace:*",
     "@pierre/trees": "1.0.0-beta.4",
+    "@powersync/drizzle-driver": "0.7.3",
+    "@powersync/react": "1.10.0",
+    "@powersync/web": "1.38.4",
     "@react-router/fs-routes": "7.17.0",
     "@react-router/node": "7.17.0",
-    "@tanstack/react-query": "5.101.0",
     "@tanstack/react-table": "8.21.3",
     "better-sqlite3": "12.11.1",
     "drizzle-orm": "0.45.2",
@@ -33,7 +34,8 @@
     "react-dom": "19.2.7",
     "react-hook-form": "7.79.0",
     "react-router": "7.17.0",
-    "tailwindcss": "4.3.1"
+    "tailwindcss": "4.3.1",
+    "zod": "4.4.3"
   },
   "devDependencies": {
     "@electron/rebuild": "4.0.4",
