@@ -220,20 +220,7 @@ function DataTableContent({
         </TableHeader>
         <TableBody>
           {rows.length ? (
-            rows.map((row) => (
-              <TableRow data-state={row.getIsSelected() ? "selected" : undefined} key={row.id}>
-                {hasSelection ? (
-                  <TableCell className="w-10 px-2">
-                    <DataTableSelectionCell row={row} />
-                  </TableCell>
-                ) : null}
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
+            <DataTableRows hasSelection={hasSelection} rows={rows} />
           ) : (
             <TableRow>
               <TableCell
@@ -247,6 +234,38 @@ function DataTableContent({
         </TableBody>
       </Table>
     </div>
+  );
+}
+
+function DataTableRows<TData>({ hasSelection, rows }: { hasSelection: boolean; rows: Row<TData>[] }) {
+  return rows.map((row) => (
+    <DataTableRow hasSelection={hasSelection} key={row.id} row={row} />
+  ));
+}
+
+interface DataTableRowProps<TData> extends React.ComponentProps<"tr"> {
+  hasSelection: boolean;
+  row: Row<TData>;
+}
+
+function DataTableRow<TData>({
+  hasSelection,
+  row,
+  ...props
+}: DataTableRowProps<TData>) {
+  return (
+    <TableRow data-state={row.getIsSelected() ? "selected" : undefined} {...props}>
+      {hasSelection ? (
+        <TableCell className="w-10 px-2">
+          <DataTableSelectionCell row={row} />
+        </TableCell>
+      ) : null}
+      {row.getVisibleCells().map((cell) => (
+        <TableCell key={cell.id}>
+          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+        </TableCell>
+      ))}
+    </TableRow>
   );
 }
 
