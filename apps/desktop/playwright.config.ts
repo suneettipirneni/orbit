@@ -19,8 +19,8 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   webServer: {
-    command: "pnpm exec vite --config vite.config.ts --host 127.0.0.1",
-    reuseExistingServer: !process.env.CI,
+    command: "env ORBIT_E2E_MOCKS=1 pnpm exec vite --config vite.config.ts --host 127.0.0.1",
+    reuseExistingServer: false,
     timeout: 120_000,
     url: "http://127.0.0.1:5173",
   },

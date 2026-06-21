@@ -5,7 +5,7 @@ test("ANKI-BROWSER-001 ANKI-BROWSER-003: Browser shows search, table, editor, an
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await expect(page.getByRole("textbox", { name: "Search cards" })).toBeVisible();
   await expect(page.getByRole("region", { name: "Card list" })).toBeVisible();
@@ -25,7 +25,7 @@ test("ANKI-BROWSER-001 ANKI-BROWSER-003: Browser shows search, table, editor, an
 
 test("ANKI-BROWSER-002: submitted browser search filters matching cards", async ({ page }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page.getByRole("textbox", { name: "Search cards" }).fill("Jupiter");
   await page.keyboard.press("Enter");
@@ -38,7 +38,7 @@ test("ANKI-BROWSER-004: editor save updates stored field text and refreshes the 
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page
     .getByRole("row", { name: /Capital of France/ })
@@ -72,7 +72,7 @@ test("ANKI-BROWSER-005 ANKI-BROWSER-006: browser toggles between card and note r
       },
     ],
   });
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await expect(page.getByText("0 of 2 row(s) selected.")).toBeVisible();
 

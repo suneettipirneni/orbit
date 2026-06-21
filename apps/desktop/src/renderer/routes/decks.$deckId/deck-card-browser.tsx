@@ -33,7 +33,7 @@ import {
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Button } from "@orbit/ui/components/button";
 import { DataTable } from "@orbit/ui/components/data-table";
 import { Separator } from "@orbit/ui/components/separator";
@@ -55,8 +55,6 @@ export interface DeckCardBrowserProps {
 }
 
 export function DeckCardBrowser({ deckId }: DeckCardBrowserProps) {
-  "use no memo";
-
   const isCollectionScope = !deckId;
   const resolvedDeckId = deckId ?? allDecksCardScope;
   const { data: [decksPage] = [] } = useDecksQuery({ pageSize: 100 });
@@ -126,84 +124,70 @@ export function DeckCardBrowser({ deckId }: DeckCardBrowserProps) {
     query: preferences.ignoreAccentsInSearch ? undefined : submittedQueryText || undefined,
     searchWithinFormatting: browserOptions.searchWithinFormatting,
   });
-  const visibleDeckCards = useMemo(() => {
-    const normalizedQuery = normalizeTextForAccentPreference(
-      submittedQueryText.trim(),
-      preferences.ignoreAccentsInSearch,
-    );
-
-    return (deckCardsPage?.data ?? []).filter((card) => {
-      if (deletedBrowserNoteIds.has(card.noteId)) {
-        return false;
-      }
-
-      if (!preferences.ignoreAccentsInSearch || !normalizedQuery) {
-        return true;
-      }
-
-      const searchableText = normalizeTextForAccentPreference(`${card.front} ${card.back}`, true);
-
-      return searchableText.includes(normalizedQuery);
-    });
-  }, [
-    deckCardsPage?.data,
-    deletedBrowserNoteIds,
+  const normalizedQuery = normalizeTextForAccentPreference(
+    submittedQueryText.trim(),
     preferences.ignoreAccentsInSearch,
-    submittedQueryText,
-  ]);
-  const usedBrowserTags = useMemo(
-    () => Array.from(new Set(visibleDeckCards.flatMap((card) => card.ankiTags ?? []))).sort(),
-    [visibleDeckCards],
   );
-  const browserRows = useMemo(
-    () => (displayMode === "notes" ? collapseCardsByNote(visibleDeckCards) : visibleDeckCards),
-    [displayMode, visibleDeckCards],
-  );
+  const visibleDeckCards = (deckCardsPage?.data ?? []).filter((card) => {
+    if (deletedBrowserNoteIds.has(card.noteId)) {
+      return false;
+    }
+
+    if (!preferences.ignoreAccentsInSearch || !normalizedQuery) {
+      return true;
+    }
+
+    const searchableText = normalizeTextForAccentPreference(`${card.front} ${card.back}`, true);
+
+    return searchableText.includes(normalizedQuery);
+  });
+  const usedBrowserTags = Array.from(
+    new Set(visibleDeckCards.flatMap((card) => card.ankiTags ?? [])),
+  ).sort();
+  const browserRows =
+    displayMode === "notes" ? collapseCardsByNote(visibleDeckCards) : visibleDeckCards;
   const browserRowCount = browserRows.length;
   const browserTotalRowCount =
     displayMode === "cards"
       ? (deckCardsPage?.pagination.total ?? browserRowCount)
       : browserRowCount;
-  const columns = useMemo<ColumnDef<CardPreview>[]>(
-    () => [
-      {
-        accessorKey: "front",
-        cell: ({ row }) => (
-          <div className="min-w-0 max-w-full">
-            <p className="wrap-anywhere font-medium">{row.original.front}</p>
-          </div>
+  const columns: ColumnDef<CardPreview>[] = [
+    {
+      accessorKey: "front",
+      cell: ({ row }) => (
+        <div className="min-w-0 max-w-full">
+          <p className="wrap-anywhere font-medium">{row.original.front}</p>
+        </div>
+      ),
+      header: "Card",
+    },
+    {
+      accessorKey: "dueAt",
+      cell: ({ row }) => formatDueDate(row.original.dueAt),
+      header: "Due",
+    },
+    {
+      accessorKey: "ankiSortField",
+      cell: ({ row }) =>
+        row.original.ankiSortField || <span className="text-muted-foreground">-</span>,
+      header: "Sort field",
+    },
+    {
+      accessorKey: "ankiCardType",
+      cell: ({ row }) =>
+        row.original.ankiCardType === null ? (
+          <span className="text-muted-foreground">-</span>
+        ) : (
+          row.original.ankiCardType
         ),
-        header: "Card",
-      },
-      {
-        accessorKey: "dueAt",
-        cell: ({ row }) => formatDueDate(row.original.dueAt),
-        header: "Due",
-      },
-      {
-        accessorKey: "ankiSortField",
-        cell: ({ row }) =>
-          row.original.ankiSortField || <span className="text-muted-foreground">-</span>,
-        header: "Sort field",
-      },
-      {
-        accessorKey: "ankiCardType",
-        cell: ({ row }) =>
-          row.original.ankiCardType === null ? (
-            <span className="text-muted-foreground">-</span>
-          ) : (
-            row.original.ankiCardType
-          ),
-        header: "Card type",
-      },
-      {
-        accessorKey: "intervalDays",
-        cell: ({ row }) => `${row.original.intervalDays} days`,
-        header: "Interval",
-      },
-    ],
-    [],
-  );
+      header: "Card type",
+    },
+    {
+      accessorKey: "intervalDays",
+      cell: ({ row }) => `${row.original.intervalDays} days`,
+      header: "Interval",
+    },
+  ];
   const table = useReactTable({
     columns,
     data: browserRows,

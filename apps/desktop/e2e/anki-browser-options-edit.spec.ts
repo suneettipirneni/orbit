@@ -5,7 +5,7 @@ test("ANKI-BROWSER-037: Browser Options applies font, font size, and line size d
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page.getByRole("button", { name: "Browser settings" }).click();
   await expect(page.getByRole("dialog", { name: "Browser Options" })).toBeVisible();
@@ -32,7 +32,7 @@ test("ANKI-BROWSER-038: Browser Options can include formatting markup in search"
       },
     ],
   });
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page.getByRole("textbox", { name: "Search cards" }).fill("omega");
   await page.keyboard.press("Enter");
@@ -51,7 +51,7 @@ test("ANKI-BROWSER-039 ANKI-BROWSER-040: Browser Undo and Redo revert and reappl
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page
     .getByRole("row", { name: /Capital of France/ })
@@ -72,7 +72,7 @@ test("ANKI-BROWSER-041 ANKI-BROWSER-042: Browser Close hides the browser and Ful
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   const browserWorkArea = page.getByTestId("browser-work-area");
   await page.getByRole("button", { name: "Full screen browser" }).click();

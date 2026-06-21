@@ -5,7 +5,7 @@ test("ANKI-ADD-NOTES-001 ANKI-ADD-NOTES-002 ANKI-ADD-NOTES-010: Add dialog shows
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   const addNoteForm = page.getByRole("form", { name: "Add note" });
 
@@ -19,7 +19,7 @@ test("ANKI-ADD-NOTES-003 ANKI-ADD-NOTES-011 ANKI-ADD-NOTES-012 ANKI-ADD-NOTES-01
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   const addNoteForm = page.getByRole("form", { name: "Add note" });
 
@@ -43,7 +43,7 @@ test("ANKI-ADD-NOTES-004 ANKI-ADD-NOTES-005 ANKI-ADD-NOTES-007 ANKI-ADD-NOTES-00
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   const addNoteForm = page.getByRole("form", { name: "Add note" });
 
@@ -77,7 +77,7 @@ test("ANKI-ADD-NOTES-006 ANKI-ADD-NOTES-009 ANKI-ADD-NOTES-014 ANKI-ADD-NOTES-01
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   const addNoteForm = page.getByRole("form", { name: "Add note" });
 
@@ -98,7 +98,7 @@ test("ANKI-ADD-NOTES-016 ANKI-ADD-NOTES-017 ANKI-ADD-NOTES-018: Add History open
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   const addNoteForm = page.getByRole("form", { name: "Add note" });
 
@@ -120,7 +120,7 @@ test("ANKI-EDITOR-001 ANKI-EDITOR-002 ANKI-EDITOR-003 ANKI-EDITOR-004 ANKI-EDITO
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   const addNoteForm = page.getByRole("form", { name: "Add note" });
   const front = addNoteForm.getByRole("textbox", { name: "Front" });
@@ -146,7 +146,7 @@ test("ANKI-EDITOR-008 ANKI-EDITOR-009 ANKI-EDITOR-010 ANKI-EDITOR-011 ANKI-EDITO
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   const addNoteForm = page.getByRole("form", { name: "Add note" });
   const front = addNoteForm.getByRole("textbox", { name: "Front" });
@@ -182,7 +182,7 @@ test("ANKI-EDITOR-017 ANKI-EDITOR-018 ANKI-EDITOR-019: image occlusion opens fro
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   const addNoteForm = page.getByRole("form", { name: "Add note" });
 

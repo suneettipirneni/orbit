@@ -3,7 +3,7 @@ import { mockOrbitApi } from "./fixtures/orbit-api";
 
 test("ANKI-BROWSER-015: Browser changes the deck for selected cards", async ({ page }) => {
   await mockOrbitApi(page, { includeDragTargetDeck: true });
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page.getByRole("checkbox", { name: "Select all rows" }).click();
   await page.getByRole("combobox", { name: "Selected cards target deck" }).selectOption("deck-3");
@@ -28,7 +28,7 @@ test("ANKI-BROWSER-015: Browser changes the deck for selected cards", async ({ p
 
 test("ANKI-BROWSER-016: Browser sets the due date for selected cards", async ({ page }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page.getByRole("checkbox", { name: "Select all rows" }).click();
   await page.getByRole("textbox", { name: "Selected card due date" }).fill("2026-07-01");
@@ -55,7 +55,7 @@ test("ANKI-BROWSER-017 ANKI-BROWSER-018: Browser forgets and repositions selecte
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page.getByRole("checkbox", { name: "Select all rows" }).click();
   await page.getByRole("button", { name: "Forget card" }).click();
@@ -85,7 +85,7 @@ test("ANKI-BROWSER-019 ANKI-BROWSER-020 ANKI-BROWSER-021: Browser suspends, unsu
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page.getByRole("checkbox", { name: "Select all rows" }).click();
   await page.getByRole("button", { name: "Suspend card" }).click();
@@ -119,7 +119,7 @@ test("ANKI-BROWSER-019 ANKI-BROWSER-020 ANKI-BROWSER-021: Browser suspends, unsu
 
 test("ANKI-BROWSER-022: Browser applies a flag color to selected cards", async ({ page }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page.getByRole("checkbox", { name: "Select all rows" }).click();
   await page.getByRole("button", { name: "Flag card" }).click();

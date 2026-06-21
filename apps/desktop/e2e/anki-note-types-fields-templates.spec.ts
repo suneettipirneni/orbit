@@ -5,7 +5,7 @@ test("ANKI-NOTETYPE-001 ANKI-NOTETYPE-002 ANKI-NOTETYPE-003 ANKI-NOTETYPE-004 AN
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   const addNoteForm = page.getByRole("form", { name: "Add note" });
   await addNoteForm.getByRole("button", { name: "Manage note types" }).click();
@@ -44,7 +44,7 @@ test("ANKI-NOTETYPE-007 ANKI-NOTETYPE-008 ANKI-NOTETYPE-009: Note Type Options s
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page.getByRole("button", { name: "Manage note types" }).click();
   await page
@@ -66,7 +66,7 @@ test("ANKI-FIELDS-001 ANKI-FIELDS-002 ANKI-FIELDS-003 ANKI-FIELDS-004 ANKI-FIELD
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   const addNoteForm = page.getByRole("form", { name: "Add note" });
   await addNoteForm.getByRole("button", { name: "Manage note types" }).click();
@@ -121,7 +121,7 @@ test("ANKI-TEMPLATE-001 ANKI-TEMPLATE-002 ANKI-TEMPLATE-003 ANKI-TEMPLATE-004 AN
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page.getByRole("button", { name: "Manage note types" }).click();
   await page.getByRole("button", { name: "Cards" }).click();
@@ -170,7 +170,7 @@ test("ANKI-TEMPLATE-011 ANKI-TEMPLATE-012 ANKI-TEMPLATE-013 ANKI-TEMPLATE-014 AN
   await page.context().grantPermissions(["clipboard-read", "clipboard-write"], {
     origin: "http://127.0.0.1:5173",
   });
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page.getByRole("button", { name: "Manage note types" }).click();
   await page.getByRole("button", { name: "Cards" }).click();

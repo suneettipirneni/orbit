@@ -1,6 +1,6 @@
 import type { DeckSummary } from "@orbit/types";
 import { FileTree as PierreFileTree, useFileTree } from "@pierre/trees/react";
-import { useEffect, useMemo, useRef, type RefObject } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 
 export function BrowserSidebar({
   activeDeckId,
@@ -19,21 +19,14 @@ export function BrowserSidebar({
   onActivateDeck: (deckName: string) => void;
   onFilterChange: (filter: string) => void;
 }) {
-  const deckPaths = useMemo(() => decks.map((deckOption) => deckOption.name), [decks]);
+  const deckPaths = decks.map((deckOption) => deckOption.name);
   const activeDeckPath = decks.find((deckOption) => deckOption.id === activeDeckId)?.name;
-  const deckByPath = useMemo(
-    () => new Map(decks.map((deckOption) => [deckOption.name, deckOption])),
-    [decks],
-  );
-  const visibleDeckPaths = useMemo(() => {
-    const normalizedFilter = filter.trim().toLowerCase();
+  const deckByPath = new Map(decks.map((deckOption) => [deckOption.name, deckOption]));
+  const normalizedFilter = filter.trim().toLowerCase();
+  const visibleDeckPaths = normalizedFilter
+    ? deckPaths.filter((deckPath) => deckPath.toLowerCase().includes(normalizedFilter))
+    : deckPaths;
 
-    if (!normalizedFilter) {
-      return deckPaths;
-    }
-
-    return deckPaths.filter((deckPath) => deckPath.toLowerCase().includes(normalizedFilter));
-  }, [deckPaths, filter]);
   const deckByPathRef = useRef(deckByPath);
   const { model } = useFileTree({
     fileTreeSearchMode: "hide-non-matches",

@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => {
 test("ANKI-BROWSER-043 ANKI-BROWSER-044 ANKI-BROWSER-045: browser display zoom can increase, decrease, and reset", async ({
   page,
 }) => {
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   const browserWorkArea = page.getByTestId("browser-work-area");
   await expect(browserWorkArea).toHaveAttribute("data-browser-zoom", "1");

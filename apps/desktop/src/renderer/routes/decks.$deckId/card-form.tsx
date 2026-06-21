@@ -1,5 +1,5 @@
 import type { DeckSummary } from "@orbit/types";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@orbit/ui/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@orbit/ui/components/card";
 import { Field, FieldContent, FieldGroup, FieldLabel } from "@orbit/ui/components/field";
@@ -124,28 +124,22 @@ const INITIAL_NOTE_TYPES: AddNoteType[] = [
 ];
 
 export function CardForm({ deckId, deckName, deckOptions = [], initialValues }: CardFormProps) {
-  "use no memo";
-
-  const availableDecks = useMemo(
-    () =>
-      deckOptions.length
-        ? deckOptions
-        : [
-            {
-              createdAt: "",
-              description: null,
-              dueCards: 0,
-              id: deckId,
-              learningCards: 0,
-              name: deckName,
-              newCards: 0,
-              reviewCards: 0,
-              totalCards: 0,
-              updatedAt: "",
-            },
-          ],
-    [deckId, deckName, deckOptions],
-  );
+  const availableDecks = deckOptions.length
+    ? deckOptions
+    : [
+        {
+          createdAt: "",
+          description: null,
+          dueCards: 0,
+          id: deckId,
+          learningCards: 0,
+          name: deckName,
+          newCards: 0,
+          reviewCards: 0,
+          totalCards: 0,
+          updatedAt: "",
+        },
+      ];
   const [preferences, setPreferences] = useState(() => loadAnkiPreferences());
   const [noteTypes, setNoteTypes] = useState<AddNoteType[]>(INITIAL_NOTE_TYPES);
   const [selectedDeckId, setSelectedDeckId] = useState(deckId);

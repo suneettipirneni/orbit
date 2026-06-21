@@ -5,7 +5,7 @@ test("ANKI-BROWSER-007 ANKI-BROWSER-008: Browser can select all visible rows and
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page.getByRole("checkbox", { name: "Select all rows" }).click();
   await expect(page.getByText("2 of 2 row(s) selected.")).toBeVisible();
@@ -35,7 +35,7 @@ test("ANKI-BROWSER-009: Select notes selects sibling card rows for selected note
       { back: "Other answer", front: "Other card", id: "card-3", noteId: "note-other" },
     ],
   });
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page
     .getByRole("row", { name: /Sibling one/ })
@@ -54,7 +54,7 @@ test("ANKI-BROWSER-010 ANKI-BROWSER-011: Browser adds and removes tags on select
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page
     .getByRole("row", { name: /Capital of France/ })
@@ -75,7 +75,7 @@ test("ANKI-BROWSER-013 ANKI-BROWSER-014: Browser toggles marked state for select
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page
     .getByRole("row", { name: /Capital of France/ })

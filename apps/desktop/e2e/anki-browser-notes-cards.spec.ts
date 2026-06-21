@@ -5,7 +5,7 @@ test("ANKI-BROWSER-048 ANKI-BROWSER-049 ANKI-BROWSER-050: Browser Add opens the 
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page
     .getByRole("row", { name: /Capital of France/ })
@@ -25,7 +25,7 @@ test("ANKI-BROWSER-051: Browser Create Copy opens Add Notes with copied note con
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page
     .getByRole("row", { name: /Capital of France/ })
@@ -44,7 +44,7 @@ test("ANKI-BROWSER-052: Browser Delete removes selected notes and their cards af
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page
     .getByRole("row", { name: /Capital of France/ })
@@ -59,7 +59,7 @@ test("ANKI-BROWSER-052: Browser Delete removes selected notes and their cards af
 
 test("ANKI-BROWSER-053: Browser Grade Now immediately grades selected cards", async ({ page }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page.getByRole("checkbox", { name: "Select all rows" }).click();
   await page.getByRole("button", { name: "Grade now" }).click();
@@ -85,7 +85,7 @@ test("ANKI-BROWSER-054 ANKI-BROWSER-055: Browser flag menu applies and clears us
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page.getByRole("checkbox", { name: "Select all rows" }).click();
   await page.getByRole("button", { name: "Flag card" }).click();
@@ -116,7 +116,7 @@ test("ANKI-BROWSER-065 ANKI-BROWSER-066 ANKI-BROWSER-067 ANKI-BROWSER-068: Brows
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page
     .getByTestId("browser-work-area")

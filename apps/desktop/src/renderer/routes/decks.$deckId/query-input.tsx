@@ -1,7 +1,6 @@
 import {
   useEffect,
   useId,
-  useMemo,
   useRef,
   useState,
   type KeyboardEvent,
@@ -114,12 +113,9 @@ export function QueryInput({
   const queryText = isControlled ? value : internalQueryText;
   const draft = draftState && queryText.endsWith(draftState) ? draftState : "";
   const committedText = trimDraft(queryText, draft);
-  const segments = useMemo(() => tokenizeQuerySegments(committedText), [committedText]);
-  const draftToken = useMemo(() => parseDraftToken(draft), [draft]);
-  const activeSuggestions = useMemo(
-    () => buildSuggestions(draft, suggestions),
-    [draft, suggestions],
-  );
+  const segments = tokenizeQuerySegments(committedText);
+  const draftToken = parseDraftToken(draft);
+  const activeSuggestions = buildSuggestions(draft, suggestions);
   const suggestionsOpen =
     !disabled &&
     inputFocused &&

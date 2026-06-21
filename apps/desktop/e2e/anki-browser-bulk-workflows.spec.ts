@@ -3,7 +3,7 @@ import { mockOrbitApi } from "./fixtures/orbit-api";
 
 test("ANKI-BROWSER-012: Clear Unused Tags removes tags not assigned to notes", async ({ page }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await expect(page.getByText("Tag list: science, unused")).toBeVisible();
 
@@ -18,7 +18,7 @@ test("ANKI-BROWSER-023: Change Note Type maps selected notes to the target type"
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page
     .getByRole("row", { name: /Capital of France/ })
@@ -46,7 +46,7 @@ test("ANKI-BROWSER-024: Find Duplicates reports duplicate note groups for a fiel
       { back: "Answer three", front: "Unique term", id: "card-3", noteId: "note-3" },
     ],
   });
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page.getByRole("button", { name: "Find duplicates" }).click();
   await page.getByRole("combobox", { name: "Duplicate field" }).selectOption("front");
@@ -63,7 +63,7 @@ test("ANKI-BROWSER-025: Find and Replace updates matching selected note fields",
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page
     .getByRole("row", { name: /Capital of France/ })
@@ -94,7 +94,7 @@ test("ANKI-BROWSER-025: Find and Replace updates matching selected note fields",
 
 test("ANKI-BROWSER-026: Export Notes opens with selected notes as scope", async ({ page }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page
     .getByRole("row", { name: /Capital of France/ })
@@ -111,7 +111,7 @@ test("ANKI-BROWSER-027: Create Filtered Deck uses current search and selection c
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page.getByPlaceholder("Search cards with Anki syntax...").fill("Capital");
   await page.keyboard.press("Enter");

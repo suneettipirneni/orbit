@@ -5,7 +5,7 @@ test("ANKI-BROWSER-056 ANKI-BROWSER-057 ANKI-BROWSER-058 ANKI-BROWSER-059 ANKI-B
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page.getByRole("button", { name: "Find/search focus" }).click();
   await expect(page.getByRole("textbox", { name: "Search cards" })).toBeFocused();
@@ -37,7 +37,7 @@ test("ANKI-BROWSER-061 ANKI-BROWSER-062 ANKI-BROWSER-063 ANKI-BROWSER-064: Brows
       { back: "Three back", front: "Last card", id: "card-3", noteId: "note-3" },
     ],
   });
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page
     .getByRole("row", { name: /First card/ })

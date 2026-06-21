@@ -6,7 +6,7 @@ test("ANKI-BROWSER-028 ANKI-BROWSER-029 ANKI-BROWSER-046 ANKI-BROWSER-047: Brows
 }) => {
   await page.setViewportSize({ height: 700, width: 1100 });
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   const browserWorkArea = page.getByTestId("browser-work-area");
   await expect(browserWorkArea).toHaveAttribute("data-browser-layout", "horizontal");
@@ -26,7 +26,7 @@ test("ANKI-BROWSER-030 ANKI-BROWSER-031 ANKI-BROWSER-032: Browser sidebar can hi
   page,
 }) => {
   await mockOrbitApi(page, { includeDragTargetDeck: true });
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
   const browserWorkArea = page.getByTestId("browser-work-area");
 
   await expect(page.getByRole("complementary", { name: "Browser sidebar panel" })).toBeVisible();
@@ -47,7 +47,7 @@ test("ANKI-BROWSER-033 ANKI-BROWSER-034: Browser preview opens for the selected 
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
   await page.context().grantPermissions(["clipboard-read", "clipboard-write"], {
     origin: new URL(page.url()).origin,
   });
@@ -72,7 +72,7 @@ test("ANKI-BROWSER-035 ANKI-BROWSER-036: Browser Card Info shows metadata and co
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page
     .getByRole("row", { name: /Capital of France/ })

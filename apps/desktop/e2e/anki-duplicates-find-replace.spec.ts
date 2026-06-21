@@ -11,7 +11,7 @@ test("ANKI-DUPES-001 ANKI-DUPES-002 ANKI-DUPES-003 ANKI-DUPES-004: duplicate sea
       { back: "Answer three", front: "Other shared", id: "card-3", noteId: "note-3" },
     ],
   });
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page.getByRole("button", { name: "Find duplicates" }).click();
 
@@ -39,7 +39,7 @@ test("ANKI-FIND-REPLACE-001 ANKI-FIND-REPLACE-002 ANKI-FIND-REPLACE-003: find an
       { back: "alpha back", front: "alpha front", id: "card-2", noteId: "note-2" },
     ],
   });
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page
     .getByRole("row", { name: /card-1|alpha front/ })
@@ -82,7 +82,7 @@ test("ANKI-FIND-REPLACE-004 ANKI-FIND-REPLACE-005 ANKI-FIND-REPLACE-006: find an
       },
     ],
   });
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page
     .getByRole("row", { name: /Capital of France/ })

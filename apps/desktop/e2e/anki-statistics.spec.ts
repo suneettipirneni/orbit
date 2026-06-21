@@ -5,7 +5,7 @@ test("ANKI-STATS-001 ANKI-STATS-002 ANKI-STATS-003: Statistics opens and switche
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page.getByRole("button", { name: "Stats" }).click();
 
@@ -13,6 +13,10 @@ test("ANKI-STATS-001 ANKI-STATS-002 ANKI-STATS-003: Statistics opens and switche
   const report = dialog.getByRole("region", { name: "Statistics report web view" });
 
   await expect(report).toContainText("Statistics report");
+  await expect(report).toContainText("Scope: Collection");
+  await expect(report).toContainText("Deck: All decks");
+
+  await dialog.getByRole("radio", { exact: true, name: "Deck" }).click();
   await expect(report).toContainText("Scope: Deck");
   await expect(report).toContainText("Deck: Default");
 
@@ -29,7 +33,7 @@ test("ANKI-STATS-004 ANKI-STATS-005 ANKI-STATS-006 ANKI-STATS-007: Statistics re
   page,
 }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page.getByRole("button", { name: "Stats" }).click();
 
@@ -45,13 +49,14 @@ test("ANKI-STATS-004 ANKI-STATS-005 ANKI-STATS-006 ANKI-STATS-007: Statistics re
   await dialog.getByRole("radio", { name: "Deck life" }).click();
   await expect(report).toContainText("Window: deck life");
 
+  await dialog.getByRole("radio", { exact: true, name: "Deck" }).click();
   await dialog.getByRole("combobox", { name: "Statistics deck" }).selectOption("deck-2");
   await expect(report).toContainText("Deck: Default::Biology");
 });
 
 test("ANKI-STATS-008: Statistics closes without changing review data", async ({ page }) => {
   await mockOrbitApi(page);
-  await page.goto("/decks/deck-1");
+  await page.goto("/browse");
 
   await page.getByRole("button", { name: "Stats" }).click();
   await expect(page.getByRole("dialog", { name: "Statistics" })).toBeVisible();

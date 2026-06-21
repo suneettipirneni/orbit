@@ -91,8 +91,6 @@ type DeckDialogState =
   | undefined;
 
 export function DeckList({ onSelectDeck, selectedDeckId }: DeckListProps) {
-  "use no memo";
-
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [collapsedDeckIds, setCollapsedDeckIds] = useState<Set<string>>(() => new Set());
   const [deckDialog, setDeckDialog] = useState<DeckDialogState>();
