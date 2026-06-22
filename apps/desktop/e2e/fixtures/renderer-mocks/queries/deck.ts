@@ -24,7 +24,6 @@ export function useDecksQuery(input: PaginationInput = {}) {
   useEffect(() => {
     let isCurrent = true;
 
-    setIsLoading(true);
     void getApi()
       .decks.list(input)
       .then((response) => {
@@ -55,7 +54,6 @@ export function useDeckQuery(deckId: string) {
   useEffect(() => {
     let isCurrent = true;
 
-    setIsLoading(true);
     void getApi()
       .decks.get(deckId)
       .then((response) => {
@@ -86,7 +84,6 @@ export function useDeckCardsQuery(deckId: string, input: ListDeckCardsInput = {}
   useEffect(() => {
     let isCurrent = true;
 
-    setIsLoading(true);
     void getApi()
       .decks.listCards(deckId, input)
       .then((response) => {
@@ -106,4 +103,20 @@ export function useDeckCardsQuery(deckId: string, input: ListDeckCardsInput = {}
 
 export function useCollectionCardsQuery(input: ListDeckCardsInput = {}) {
   return useDeckCardsQuery(allDecksCardScope, input);
+}
+
+export const useSuspenseDecksQuery = useDecksQuery;
+export const useSuspenseDeckQuery = useDeckQuery;
+
+export function useSuspenseDeckCardsQuery(deckId: string, input: ListDeckCardsInput = {}) {
+  const {
+    data: [cardsPage],
+    ...query
+  } = useDeckCardsQuery(deckId, input);
+
+  if (!cardsPage) {
+    throw new Error("Deck cards query did not return a page.");
+  }
+
+  return { ...query, data: cardsPage };
 }

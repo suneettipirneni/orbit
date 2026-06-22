@@ -1,4 +1,4 @@
-import { and, asc, eq, isNull, lte, sql, type Query } from "drizzle-orm";
+import { and, asc, eq, isNull, sql, type Query } from "drizzle-orm";
 import type {
   CardWithNote,
   DueCardsInput,
@@ -280,7 +280,7 @@ function activeCardFilter() {
 function dueCardFilter() {
   return and(
     activeCardFilter(),
-    lte(cards.dueAt, nowIso()),
+    sql`${cards.dueAt} <= ${currentTimestampSql()}`,
     sql`coalesce(${cards.ankiQueue}, 0) not in (-1, -2, -3)`,
   );
 }
@@ -321,6 +321,10 @@ function paginatedResponse<TData>(
 
 function nowIso() {
   return new Date().toISOString();
+}
+
+function currentTimestampSql() {
+  return sql<string>`strftime('%Y-%m-%dT%H:%M:%fZ', 'now')`;
 }
 
 function todayBoundsParameters() {

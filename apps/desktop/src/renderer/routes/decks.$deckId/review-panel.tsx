@@ -104,7 +104,10 @@ export function ReviewPanel({ deckId, onCreateCopy, onFinished }: ReviewPanelPro
   const [timeboxIntervalVersion, setTimeboxIntervalVersion] = useState(0);
   const [isTimeboxPromptOpen, setIsTimeboxPromptOpen] = useState(false);
   const [previousReviewedCard, setPreviousReviewedCard] = useState<CardWithNote>();
-  const [answerTimer, setAnswerTimer] = useState<AnswerTimer>();
+  const [answerTimerCardId, setAnswerTimerCardId] = useState(currentCard?.id);
+  const [answerTimer, setAnswerTimer] = useState<AnswerTimer | undefined>(() =>
+    currentCard ? startAnswerTimer(currentCard.id, Date.now()) : undefined,
+  );
   const [answerTimerNowMs, setAnswerTimerNowMs] = useState(() => Date.now());
   const [typedAnswerInput, setTypedAnswerInput] = useState({ cardId: "", value: "" });
   const [reviewAudio, setReviewAudio] = useState<ReviewAudioState>();
@@ -115,6 +118,19 @@ export function ReviewPanel({ deckId, onCreateCopy, onFinished }: ReviewPanelPro
   const [isReviewing, setIsReviewing] = useState(false);
   const [isUpdatingCard, setIsUpdatingCard] = useState(false);
   const [isUpdatingNote, setIsUpdatingNote] = useState(false);
+  const currentCardId = currentCard?.id;
+
+  if (answerTimerCardId !== currentCardId) {
+    const startedAtMs = Date.now();
+
+    setAnswerTimerCardId(currentCardId);
+    setReviewAudio(undefined);
+    setAudioInterruptMessage("");
+    setAutoAdvanceReminderCardId(undefined);
+    setAnswerTimer(currentCardId ? startAnswerTimer(currentCardId, startedAtMs) : undefined);
+    setAnswerTimerNowMs(startedAtMs);
+  }
+
   const side: ReviewSide = currentCard?.id === answeredCardId ? "answer" : "question";
   const isCurrentNoteMarked = currentCard?.ankiTags?.includes("marked") ?? false;
   const currentCardOwnVoice =
@@ -139,17 +155,9 @@ export function ReviewPanel({ deckId, onCreateCopy, onFinished }: ReviewPanelPro
     currentCard?.back.includes("\\[");
 
   useEffect(() => {
-    if (!currentCard) {
-      setAnswerTimer(undefined);
+    if (!currentCardId) {
       return undefined;
     }
-
-    const startedAtMs = Date.now();
-    setReviewAudio(undefined);
-    setAudioInterruptMessage("");
-    setAutoAdvanceReminderCardId(undefined);
-    setAnswerTimer(startAnswerTimer(currentCard.id, startedAtMs));
-    setAnswerTimerNowMs(startedAtMs);
 
     const intervalId = window.setInterval(() => {
       setAnswerTimerNowMs(Date.now());
@@ -158,7 +166,7 @@ export function ReviewPanel({ deckId, onCreateCopy, onFinished }: ReviewPanelPro
     return () => {
       window.clearInterval(intervalId);
     };
-  }, [currentCard?.id]);
+  }, [currentCardId]);
 
   useEffect(() => {
     if (!currentCard || !timeboxLimitMilliseconds || isTimeboxPromptOpen) {

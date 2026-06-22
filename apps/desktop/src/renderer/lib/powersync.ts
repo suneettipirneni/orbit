@@ -92,7 +92,7 @@ function resolveAutomaticStorageMode(): Exclude<PowerSyncStorageMode, "auto"> {
 
 function hasPowerSyncBackendConfiguration() {
   return Boolean(
-    (getEnvString("VITE_POWERSYNC_ENDPOINT") && getEnvString("VITE_POWERSYNC_TOKEN")) ||
+    (getEnvString("VITE_POWERSYNC_ENDPOINT") && getEnvString("VITE_POWERSYNC_DEMO_ACCESS")) ||
     getEnvString("VITE_POWERSYNC_CREDENTIALS_URL"),
   );
 }
@@ -113,11 +113,11 @@ function createBackendConnector(): PowerSyncBackendConnector {
 
 async function fetchPowerSyncCredentials(): Promise<PowerSyncCredentials | null> {
   const endpoint = getEnvString("VITE_POWERSYNC_ENDPOINT");
-  const token = getEnvString("VITE_POWERSYNC_TOKEN");
+  const demoAccess = getEnvString("VITE_POWERSYNC_DEMO_ACCESS");
   const credentialsUrl = getEnvString("VITE_POWERSYNC_CREDENTIALS_URL");
 
-  if (endpoint && token) {
-    return { endpoint, token };
+  if (endpoint && demoAccess) {
+    return { endpoint, token: demoAccess };
   }
 
   if (!credentialsUrl) {

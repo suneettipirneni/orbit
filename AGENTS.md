@@ -48,13 +48,24 @@ Anki feature behavior is documented as testable criteria under [docs/anki-featur
 
 Root scripts are defined in [package.json](package.json):
 
+- `pnpm format`
+- `pnpm format:fix`
 - `pnpm typecheck`
 - `pnpm lint`
 - `pnpm test`
 - `pnpm test:e2e`
 - `pnpm build`
 
+Formatting is handled by the root `oxfmt` scripts. The Turbo task graph also declares root-only `//#format` and `//#format:fix` tasks in [turbo.json](turbo.json); `format:fix` is intentionally uncached. Use `pnpm format` to check formatting and `pnpm format:fix` to apply it.
+
 Desktop-specific scripts are in [apps/desktop/package.json](apps/desktop/package.json). Use filters when narrowing scope, for example `pnpm --filter @orbit/desktop typecheck`.
+
+## Running And Inspecting The App
+
+- Start the desktop app with `pnpm dev` or `pnpm dev:desktop`. The script rebuilds native modules, starts the React Router renderer on `http://127.0.0.1:5173`, and launches Electron with `ORBIT_RENDERER_URL` pointed at that renderer.
+- When working from Codex with browser control available, open `http://127.0.0.1:5173` in the in-app browser to exercise renderer routes, click through flows, inspect console errors, and capture screenshots. This is the fastest way to verify route-level UI behavior, Suspense transitions, layout, and visual regressions.
+- Browser inspection does not fully replace Electron verification. Anything that depends on the preload API, native modules, filesystem dialogs, or Electron IPC should still be checked through the Electron app or the desktop e2e tests.
+- The e2e config in [apps/desktop/playwright.config.ts](apps/desktop/playwright.config.ts) also targets `http://127.0.0.1:5173`, so browser observations should line up with Playwright route behavior unless the scenario depends on Electron-only capabilities.
 
 ## Working Notes
 

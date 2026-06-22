@@ -39,7 +39,7 @@ import {
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Button } from "@orbit/ui/components/button";
 import {
   DataTableColumnVisibility,
@@ -109,6 +109,8 @@ const browserColumns: ColumnDef<CardPreview>[] = [
 ];
 
 export function DeckCardBrowser({ deckId }: DeckCardBrowserProps) {
+  "use no memo";
+
   const isCollectionScope = !deckId;
   const resolvedDeckId = deckId ?? allDecksCardScope;
   const { data: [decksPage] = [] } = useDecksQuery(browserDecksQueryInput);
@@ -168,60 +170,40 @@ export function DeckCardBrowser({ deckId }: DeckCardBrowserProps) {
   const [isUpdatingNote, setIsUpdatingNote] = useState(false);
   const cardListRef = useRef<HTMLElement>(null);
   const sidebarFilterRef = useRef<HTMLInputElement>(null);
-  const deckCardsQueryInput = useMemo<ListDeckCardsInput>(
-    () => ({
-      page: pagination.pageIndex + 1,
-      pageSize: pagination.pageSize,
-      query: preferences.ignoreAccentsInSearch ? undefined : submittedQueryText || undefined,
-      searchWithinFormatting: browserOptions.searchWithinFormatting,
-    }),
-    [
-      browserOptions.searchWithinFormatting,
-      pagination.pageIndex,
-      pagination.pageSize,
-      preferences.ignoreAccentsInSearch,
-      submittedQueryText,
-    ],
-  );
+  const deckCardsQueryInput: ListDeckCardsInput = {
+    page: pagination.pageIndex + 1,
+    pageSize: pagination.pageSize,
+    query: preferences.ignoreAccentsInSearch ? undefined : submittedQueryText || undefined,
+    searchWithinFormatting: browserOptions.searchWithinFormatting,
+  };
   const {
     data: [deckCardsPage] = [],
     isLoading: isDeckCardsLoading,
     refresh: refreshDeckCards,
   } = useDeckCardsQuery(resolvedDeckId, deckCardsQueryInput);
   const deckCards = deckCardsPage?.data ?? emptyCardPreviews;
-  const normalizedQuery = useMemo(
-    () =>
-      normalizeTextForAccentPreference(
-        submittedQueryText.trim(),
-        preferences.ignoreAccentsInSearch,
-      ),
-    [preferences.ignoreAccentsInSearch, submittedQueryText],
+  const normalizedQuery = normalizeTextForAccentPreference(
+    submittedQueryText.trim(),
+    preferences.ignoreAccentsInSearch,
   );
-  const visibleDeckCards = useMemo(
-    () =>
-      deckCards.filter((card) => {
-        if (deletedBrowserNoteIds.has(card.noteId)) {
-          return false;
-        }
+  const visibleDeckCards = deckCards.filter((card) => {
+    if (deletedBrowserNoteIds.has(card.noteId)) {
+      return false;
+    }
 
-        if (!preferences.ignoreAccentsInSearch || !normalizedQuery) {
-          return true;
-        }
+    if (!preferences.ignoreAccentsInSearch || !normalizedQuery) {
+      return true;
+    }
 
-        const searchableText = normalizeTextForAccentPreference(`${card.front} ${card.back}`, true);
+    const searchableText = normalizeTextForAccentPreference(`${card.front} ${card.back}`, true);
 
-        return searchableText.includes(normalizedQuery);
-      }),
-    [deckCards, deletedBrowserNoteIds, normalizedQuery, preferences.ignoreAccentsInSearch],
-  );
-  const usedBrowserTags = useMemo(
-    () => Array.from(new Set(visibleDeckCards.flatMap((card) => card.ankiTags ?? []))).sort(),
-    [visibleDeckCards],
-  );
-  const browserRows = useMemo(
-    () => (displayMode === "notes" ? collapseCardsByNote(visibleDeckCards) : visibleDeckCards),
-    [displayMode, visibleDeckCards],
-  );
+    return searchableText.includes(normalizedQuery);
+  });
+  const usedBrowserTags = Array.from(
+    new Set(visibleDeckCards.flatMap((card) => card.ankiTags ?? [])),
+  ).sort();
+  const browserRows =
+    displayMode === "notes" ? collapseCardsByNote(visibleDeckCards) : visibleDeckCards;
   const browserRowCount = browserRows.length;
   const browserTotalRowCount =
     displayMode === "cards"
@@ -244,78 +226,56 @@ export function DeckCardBrowser({ deckId }: DeckCardBrowserProps) {
       rowSelection,
     },
   });
-  const {
-    hasSelectedRows,
-    selectedCard,
-    selectedNoteIds,
-    selectedOrCurrentCardIds,
-    selectedOrCurrentNoteIds,
-    selectedRowIndex,
-  } = useMemo(() => {
-    let selectedCard: CardPreview | undefined;
-    let selectedRowIndex = -1;
-    let lastSelectedCardId: string | undefined;
-    const selectedCardIds: string[] = [];
-    const selectedNoteIdSet = new Set<string>();
+  let selectedCard: CardPreview | undefined;
+  let selectedRowIndex = -1;
+  let lastSelectedCardId: string | undefined;
+  const selectedCardIds: string[] = [];
+  const selectedNoteIdSet = new Set<string>();
 
-    for (const [cardId, isSelected] of Object.entries(rowSelection)) {
-      if (isSelected) {
-        lastSelectedCardId = cardId;
-      }
+  for (const [cardId, isSelected] of Object.entries(rowSelection)) {
+    if (isSelected) {
+      lastSelectedCardId = cardId;
+    }
+  }
+
+  for (const [index, card] of browserRows.entries()) {
+    const isSelected = rowSelection[card.id];
+
+    if (isSelected) {
+      selectedCardIds.push(card.id);
+      selectedNoteIdSet.add(card.noteId);
     }
 
-    for (const [index, card] of browserRows.entries()) {
-      const isSelected = rowSelection[card.id];
-
-      if (isSelected) {
-        selectedCardIds.push(card.id);
-        selectedNoteIdSet.add(card.noteId);
-      }
-
-      if (card.id === lastSelectedCardId) {
-        selectedCard = card;
-        selectedRowIndex = index;
-      }
+    if (card.id === lastSelectedCardId) {
+      selectedCard = card;
+      selectedRowIndex = index;
     }
+  }
 
-    const selectedNoteIds = Array.from(selectedNoteIdSet);
-
-    return {
-      hasSelectedRows: selectedCardIds.length > 0,
-      selectedCard,
-      selectedNoteIds,
-      selectedOrCurrentCardIds:
-        selectedCardIds.length > 0 ? selectedCardIds : selectedCard ? [selectedCard.id] : [],
-      selectedOrCurrentNoteIds:
-        selectedNoteIds.length > 0 ? selectedNoteIds : selectedCard ? [selectedCard.noteId] : [],
-      selectedRowIndex,
-    };
-  }, [browserRows, rowSelection]);
-  const currentDeckSummary = useMemo(
-    () => (deckId ? deckItems.find((deckOption) => deckOption.id === deckId) : undefined),
-    [deckId, deckItems],
-  );
+  const selectedNoteIds = Array.from(selectedNoteIdSet);
+  const hasSelectedRows = selectedCardIds.length > 0;
+  const selectedOrCurrentCardIds =
+    selectedCardIds.length > 0 ? selectedCardIds : selectedCard ? [selectedCard.id] : [];
+  const selectedOrCurrentNoteIds =
+    selectedNoteIds.length > 0 ? selectedNoteIds : selectedCard ? [selectedCard.noteId] : [];
+  const currentDeckSummary = deckId
+    ? deckItems.find((deckOption) => deckOption.id === deckId)
+    : undefined;
   const selectedNoteTypeName = selectedCard
     ? (noteTypesByNoteId[selectedCard.noteId] ?? "Basic")
     : "Basic";
-  const { buriedCardCount, manuallyBuriedCardCount, schedulerBuriedCardCount } = useMemo(() => {
-    let manuallyBuriedCardCount = 0;
-    let schedulerBuriedCardCount = 0;
+  let manuallyBuriedCardCount = 0;
+  let schedulerBuriedCardCount = 0;
 
-    for (const card of visibleDeckCards) {
-      if (card.ankiQueue === -2) {
-        manuallyBuriedCardCount += 1;
-      } else if (card.ankiQueue === -3) {
-        schedulerBuriedCardCount += 1;
-      }
+  for (const card of visibleDeckCards) {
+    if (card.ankiQueue === -2) {
+      manuallyBuriedCardCount += 1;
+    } else if (card.ankiQueue === -3) {
+      schedulerBuriedCardCount += 1;
     }
+  }
 
-    return {
-      buriedCardCount: manuallyBuriedCardCount + schedulerBuriedCardCount,
-      manuallyBuriedCardCount,
-      schedulerBuriedCardCount,
-    };
-  }, [visibleDeckCards]);
+  const buriedCardCount = manuallyBuriedCardCount + schedulerBuriedCardCount;
   const effectiveBrowserLayout =
     browserLayoutMode === "auto"
       ? isWideBrowserViewport
@@ -347,14 +307,8 @@ export function DeckCardBrowser({ deckId }: DeckCardBrowserProps) {
       window.removeEventListener("orbit:anki-preferences-changed", handlePreferenceChange);
   }, []);
 
-  useEffect(() => {
-    if (selectedCard) {
-      return;
-    }
-
-    setIsCardInfoOpen(false);
-    setIsPreviewOpen(false);
-  }, [selectedCard]);
+  const isCardInfoWindowOpen = isCardInfoOpen && Boolean(selectedCard);
+  const isPreviewWindowOpen = isPreviewOpen && Boolean(selectedCard);
 
   useEffect(() => {
     const closeBrowserWindows = (event: KeyboardEvent) => {
@@ -362,9 +316,9 @@ export function DeckCardBrowser({ deckId }: DeckCardBrowserProps) {
         return;
       }
 
-      if (isCardInfoOpen) {
+      if (isCardInfoWindowOpen) {
         setIsCardInfoOpen(false);
-      } else if (isPreviewOpen) {
+      } else if (isPreviewWindowOpen) {
         setIsPreviewOpen(false);
       }
     };
@@ -372,7 +326,7 @@ export function DeckCardBrowser({ deckId }: DeckCardBrowserProps) {
     window.addEventListener("keydown", closeBrowserWindows);
 
     return () => window.removeEventListener("keydown", closeBrowserWindows);
-  }, [isCardInfoOpen, isPreviewOpen]);
+  }, [isCardInfoWindowOpen, isPreviewWindowOpen]);
 
   useEffect(() => {
     const updateViewportShape = () => {
@@ -1291,10 +1245,10 @@ export function DeckCardBrowser({ deckId }: DeckCardBrowserProps) {
               }}
             />
           </div>
-          {isPreviewOpen && selectedCard ? (
+          {isPreviewWindowOpen && selectedCard ? (
             <CardPreviewWindow card={selectedCard} onClose={() => setIsPreviewOpen(false)} />
           ) : null}
-          {isCardInfoOpen && selectedCard ? (
+          {isCardInfoWindowOpen && selectedCard ? (
             <CardInfoWindow card={selectedCard} onClose={() => setIsCardInfoOpen(false)} />
           ) : null}
           {isUnburyOpen ? (

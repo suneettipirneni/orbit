@@ -8,47 +8,36 @@ import {
   CardHeader,
   CardTitle,
 } from "@orbit/ui/components/card";
-import { Separator } from "@orbit/ui/components/separator";
-import { SidebarTrigger } from "@orbit/ui/components/sidebar";
-import { PageLayout, PageLayoutContent, PageLayoutHeader } from "@/components/layout/page";
-import { useDecksQuery } from "@/lib/queries/deck";
+import { useSuspenseDecksQuery } from "@/lib/queries/deck";
+
+const decksPageQueryInput = { pageSize: 100 };
 
 export default function DecksPage() {
-  const { data: [decksPage] = [] } = useDecksQuery({ pageSize: 100 });
+  const { data: [decksPage] = [] } = useSuspenseDecksQuery(decksPageQueryInput);
   const deckItems = decksPage?.data ?? [];
 
   return (
-    <PageLayout>
-      <PageLayoutHeader className="flex h-16 min-w-0 items-center gap-2 px-3 py-2">
-        <SidebarTrigger />
-        <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
-        <div className="min-w-0">
-          <h1 className="truncate text-base font-semibold tracking-normal">Decks</h1>
-          <p className="truncate text-xs text-muted-foreground">Study queues and card counts</p>
-        </div>
-      </PageLayoutHeader>
-      <PageLayoutContent className="gap-4">
-        {deckItems.length > 0 ? (
-          <section
-            aria-label="Deck grid"
-            className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
-          >
-            {deckItems.map((deck) => (
-              <DeckGridCard deck={deck} key={deck.id} />
-            ))}
-          </section>
-        ) : (
-          <section className="grid min-h-72 place-items-center rounded-lg border border-dashed border-border bg-card p-8">
-            <div className="text-center">
-              <h2 className="text-lg font-semibold tracking-normal">No decks yet</h2>
-              <p className="text-sm text-muted-foreground">
-                Create or import a deck from the sidebar.
-              </p>
-            </div>
-          </section>
-        )}
-      </PageLayoutContent>
-    </PageLayout>
+    <>
+      {deckItems.length > 0 ? (
+        <section
+          aria-label="Deck grid"
+          className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
+        >
+          {deckItems.map((deck) => (
+            <DeckGridCard deck={deck} key={deck.id} />
+          ))}
+        </section>
+      ) : (
+        <section className="grid min-h-72 place-items-center rounded-lg border border-dashed border-border bg-card p-8">
+          <div className="text-center">
+            <h2 className="text-lg font-semibold tracking-normal">No decks yet</h2>
+            <p className="text-sm text-muted-foreground">
+              Create or import a deck from the sidebar.
+            </p>
+          </div>
+        </section>
+      )}
+    </>
   );
 }
 

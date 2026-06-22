@@ -21,7 +21,6 @@ export function useDueCardsQuery(input: DueCardsInput = {}) {
   useEffect(() => {
     let isCurrent = true;
 
-    setIsLoading(true);
     void getApi()
       .reviews.listDue(input)
       .then((response) => {
@@ -39,6 +38,8 @@ export function useDueCardsQuery(input: DueCardsInput = {}) {
   return { data, error: undefined, isFetching: isLoading, isLoading, refresh };
 }
 
+export const useSuspenseDueCardsQuery = useDueCardsQuery;
+
 export function useTodayStudySummaryQuery() {
   const [data, setData] = useState<TodayStudySummary>();
   const [isLoading, setIsLoading] = useState(true);
@@ -52,7 +53,6 @@ export function useTodayStudySummaryQuery() {
   useEffect(() => {
     let isCurrent = true;
 
-    setIsLoading(true);
     void getApi()
       .reviews.today()
       .then((response) => {
@@ -69,6 +69,8 @@ export function useTodayStudySummaryQuery() {
 
   return { data, error: undefined, isFetching: isLoading, isLoading, refresh };
 }
+
+export const useSuspenseTodayStudySummaryQuery = useTodayStudySummaryQuery;
 
 export function useSchedulerStatusQuery() {
   const [data, setData] = useState<SchedulerStatus>({ upgradeRequired: false });

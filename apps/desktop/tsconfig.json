@@ -11,7 +11,7 @@
     "paths": {
       "@/*": ["./src/renderer/*"]
     },
-    "types": ["node", "vite/client"]
+    "types": ["node", "vite/client", "react/canary", "react-dom/canary"]
   },
   "include": [".react-router/types/**/*", "e2e/**/*.ts", "playwright.config.ts", "src"]
 }

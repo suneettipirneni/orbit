@@ -11,3 +11,7 @@ allowBuilds:
   better-sqlite3: true
   electron-winstaller: true
   esbuild: true
+minimumReleaseAgeExclude:
+  - react-dom@19.3.0-canary-247fbb45-20260622
+  - react@19.3.0-canary-247fbb45-20260622
+  - scheduler@0.28.0-canary-247fbb45-20260622

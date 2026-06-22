@@ -456,7 +456,7 @@ function activeCardFilter() {
 }
 
 function dueCount() {
-  return sql<number>`count(case when ${cards.dueAt} <= ${nowIso()} then 1 end)`;
+  return sql<number>`count(case when ${cards.dueAt} <= ${currentTimestampSql()} then 1 end)`;
 }
 
 function newCount() {
@@ -473,6 +473,10 @@ function reviewCount() {
 
 function totalCount() {
   return sql<number>`count(*) over ()`;
+}
+
+function currentTimestampSql() {
+  return sql<string>`strftime('%Y-%m-%dT%H:%M:%fZ', 'now')`;
 }
 
 function normalizePagination(input: PaginationInput = {}) {

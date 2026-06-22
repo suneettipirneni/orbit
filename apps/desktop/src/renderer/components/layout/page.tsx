@@ -2,7 +2,12 @@ import { cn } from "@orbit/ui";
 import { ComponentProps } from "react";
 
 export function PageLayoutHeader({ className, ...props }: ComponentProps<"header">) {
-  return <header {...props} className={cn("flex w-full border-b", className)} />;
+  return (
+    <header
+      {...props}
+      className={cn("flex w-full border-b h-16 shrink-0 items-center", className)}
+    />
+  );
 }
 
 export function PageLayout({ className, ...props }: ComponentProps<"main">) {

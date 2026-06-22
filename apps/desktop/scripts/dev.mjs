@@ -1,7 +1,11 @@
 import { spawn, spawnSync } from "node:child_process";
+import { createRequire } from "node:module";
 
 const rendererUrl = "http://127.0.0.1:5173";
 const children = new Set();
+const requireFromDevScript = createRequire(import.meta.url);
+
+ensureElectronInstalled();
 
 const rebuild = spawnSync("pnpm", ["run", "rebuild:native"], {
   stdio: "inherit",
@@ -48,6 +52,16 @@ for (const child of children) {
 
 for (const signal of ["SIGINT", "SIGTERM"]) {
   process.on(signal, () => shutdown(0));
+}
+
+function ensureElectronInstalled() {
+  try {
+    requireFromDevScript("electron");
+  } catch (error) {
+    console.error("Electron is not installed correctly. Run `pnpm install` and try again.");
+    console.error(error);
+    process.exit(1);
+  }
 }
 
 function shutdown(code) {

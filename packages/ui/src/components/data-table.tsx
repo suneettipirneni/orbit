@@ -62,10 +62,7 @@ export interface DataTableRootProps<TData> extends React.ComponentProps<"div"> {
 function DataTableRoot<TData>({ children, className, table, ...props }: DataTableRootProps<TData>) {
   "use no memo";
 
-  const contextValue = React.useMemo<DataTableContextValue<unknown>>(
-    () => ({ table: table as TanStackTable<unknown> }),
-    [table],
-  );
+  const contextValue: DataTableContextValue<unknown> = { table: table as TanStackTable<unknown> };
 
   return (
     <DataTableContext.Provider value={contextValue}>
@@ -127,13 +124,9 @@ function DataTableColumnVisibility({ className, label = "View" }: DataTableColum
   "use no memo";
 
   const table = useDataTable();
-  const columns = React.useMemo(
-    () =>
-      table
-        .getAllColumns()
-        .filter((column) => typeof column.accessorFn !== "undefined" && column.getCanHide()),
-    [table],
-  );
+  const columns = table
+    .getAllColumns()
+    .filter((column) => typeof column.accessorFn !== "undefined" && column.getCanHide());
 
   if (!columns.length) {
     return null;
@@ -237,10 +230,14 @@ function DataTableContent({
   );
 }
 
-function DataTableRows<TData>({ hasSelection, rows }: { hasSelection: boolean; rows: Row<TData>[] }) {
-  return rows.map((row) => (
-    <DataTableRow hasSelection={hasSelection} key={row.id} row={row} />
-  ));
+function DataTableRows<TData>({
+  hasSelection,
+  rows,
+}: {
+  hasSelection: boolean;
+  rows: Row<TData>[];
+}) {
+  return rows.map((row) => <DataTableRow hasSelection={hasSelection} key={row.id} row={row} />);
 }
 
 interface DataTableRowProps<TData> extends React.ComponentProps<"tr"> {
@@ -248,11 +245,7 @@ interface DataTableRowProps<TData> extends React.ComponentProps<"tr"> {
   row: Row<TData>;
 }
 
-function DataTableRow<TData>({
-  hasSelection,
-  row,
-  ...props
-}: DataTableRowProps<TData>) {
+function DataTableRow<TData>({ hasSelection, row, ...props }: DataTableRowProps<TData>) {
   return (
     <TableRow data-state={row.getIsSelected() ? "selected" : undefined} {...props}>
       {hasSelection ? (
@@ -280,7 +273,7 @@ export interface DataTableSelectionProps extends DataTableSelectionOptions {
 function DataTableSelection({ children, selectAll }: DataTableSelectionProps) {
   "use no memo";
 
-  const contextValue = React.useMemo<DataTableSelectionOptions>(() => ({ selectAll }), [selectAll]);
+  const contextValue: DataTableSelectionOptions = { selectAll };
 
   return (
     <DataTableSelectionContext.Provider value={contextValue}>
@@ -298,12 +291,12 @@ function DataTableSelectionHeader<TData>({
 }) {
   "use no memo";
 
+  const rows = table.getRowModel().rows;
+  const hasSelectableRows = selectAll && rows.some((row) => row.getCanSelect());
+
   if (!selectAll) {
     return null;
   }
-
-  const rows = table.getRowModel().rows;
-  const hasSelectableRows = React.useMemo(() => rows.some((row) => row.getCanSelect()), [rows]);
 
   return (
     <Checkbox
@@ -426,21 +419,13 @@ function DataTablePagination({
   const rowCount = totalRows ?? table.getRowCount();
   const rowStart = rowModel.rows.length === 0 ? 0 : pageIndex * pageSize + 1;
   const rowEnd = Math.min(rowStart + rowModel.rows.length - 1, rowCount);
-  const pageSizeOptions = React.useMemo(
-    () => normalizePageSizeOptions(pageSizeOptionsProp),
-    [pageSizeOptionsProp],
-  );
-  const selectedRowCount = React.useMemo(
-    () =>
-      table.options.manualPagination
-        ? Object.values(rowSelection).filter(Boolean).length
-        : table.getFilteredSelectedRowModel().rows.length,
-    [rowSelection, table, tableState],
-  );
-  const selectedTotalRows = React.useMemo(
-    () => (table.options.manualPagination ? rowCount : table.getFilteredRowModel().rows.length),
-    [rowCount, table, tableState],
-  );
+  const pageSizeOptions = normalizePageSizeOptions(pageSizeOptionsProp);
+  const selectedRowCount = table.options.manualPagination
+    ? Object.values(rowSelection).filter(Boolean).length
+    : table.getFilteredSelectedRowModel().rows.length;
+  const selectedTotalRows = table.options.manualPagination
+    ? rowCount
+    : table.getFilteredRowModel().rows.length;
 
   React.useEffect(() => {
     if (pageSize > 100) {
