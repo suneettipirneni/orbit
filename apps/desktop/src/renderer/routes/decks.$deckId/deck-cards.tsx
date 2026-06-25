@@ -1,5 +1,5 @@
 import { formatDueDate } from "@/lib/date-format";
-import { useDeckCardsQuery, useSuspenseDeckCardsQuery } from "@/lib/queries/deck";
+import { useSuspenseDeckCardsQuery } from "@/lib/queries/deck";
 import type { CardPreview, PaginatedResponse } from "@orbit/types";
 import {
   DataTableColumnVisibility,
@@ -9,15 +9,6 @@ import {
   DataTableToolbar,
 } from "@orbit/ui";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@orbit/ui/components/input-group";
-import { Skeleton } from "@orbit/ui/components/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@orbit/ui/components/table";
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -29,9 +20,6 @@ import { Search } from "lucide-react";
 import React from "react";
 
 const columnHelper = createColumnHelper<CardPreview>();
-const cardTableSkeletonColumns = ["Front", "Back", "Sort Field", "Due"];
-const cardTableSkeletonRows = Array.from({ length: 6 }, (_, index) => index);
-
 const columns = [
   columnHelper.accessor("front", {
     cell: (props) => props.getValue(),
@@ -100,67 +88,6 @@ export function DeckCardTable({
         totalRows={cardsPage.pagination.total}
       />
     </DataTableRoot>
-  );
-}
-
-function DeckCardTableSkeleton() {
-  return (
-    <div className="flex min-h-0 w-full flex-1 flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <Skeleton className="h-9 w-full max-w-xs" />
-        <Skeleton className="ml-auto h-8 w-20" />
-      </div>
-      <div className="min-h-0 flex-1 overflow-hidden rounded-md border *:data-[slot=table-container]:h-full *:data-[slot=table-container]:overflow-auto">
-        <Table>
-          <TableHeader>
-            <TableRow className="border-b-0!">
-              {cardTableSkeletonColumns.map((column) => (
-                <TableHead
-                  className="sticky top-0 z-10 bg-background after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-border after:content-['']"
-                  key={column}
-                >
-                  {column}
-                </TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {cardTableSkeletonRows.map((row) => (
-              <TableRow key={row}>
-                <TableCell>
-                  <Skeleton className="h-4 w-44" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton className="h-4 w-64 max-w-full" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton className="h-4 w-28" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton className="h-4 w-24" />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="flex flex-col gap-4 px-2 sm:flex-row sm:items-center sm:justify-between">
-        <Skeleton className="h-5 w-24" />
-        <div className="flex flex-wrap items-center gap-4 sm:gap-6 lg:gap-8">
-          <div className="flex items-center gap-2">
-            <Skeleton className="h-5 w-24" />
-            <Skeleton className="h-8 w-[70px]" />
-          </div>
-          <Skeleton className="h-5 w-[100px]" />
-          <div className="flex items-center gap-2">
-            <Skeleton className="hidden size-9 lg:block" />
-            <Skeleton className="size-9" />
-            <Skeleton className="size-9" />
-            <Skeleton className="hidden size-9 lg:block" />
-          </div>
-        </div>
-      </div>
-    </div>
   );
 }
 

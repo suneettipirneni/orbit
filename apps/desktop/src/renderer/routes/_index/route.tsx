@@ -102,7 +102,7 @@ function DeckProgressPanel({ decks }: { decks: DeckSummary[] }) {
       <CardContent>
         {visibleDecks.length > 0 ? (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[42rem] text-sm">
+            <table className="w-full min-w-2xl text-sm">
               <thead>
                 <tr className="border-b text-left text-xs text-muted-foreground">
                   <th className="py-2 pr-3 font-medium">Deck</th>
@@ -202,7 +202,7 @@ function HeatmapPanel({ days }: { days: ReviewHeatmapDay[] }) {
           {heatmapDays.map((day) => (
             <div
               aria-label={`${formatShortDate(day.date)}: ${day.reviews} reviews`}
-              className="size-3 rounded-[2px] bg-muted"
+              className="size-3 rounded-xs bg-muted"
               key={day.date}
               style={{
                 backgroundColor:

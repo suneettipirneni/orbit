@@ -1,7 +1,7 @@
 import "./styles.css";
 import { PowerSyncContext } from "@powersync/react";
 import { Search } from "lucide-react";
-import { Suspense, useEffect, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import {
   Link,
   isRouteErrorResponse,
@@ -102,55 +102,6 @@ function RouteFrame({
       </PageLayoutContent>
     </>
   );
-}
-
-function RouteFrameFallback({
-  deckId,
-  isBrowse,
-  isReview,
-}: {
-  deckId?: string;
-  isBrowse: boolean;
-  isReview: boolean;
-}) {
-  return (
-    <>
-      <PageLayoutHeader className="">
-        <div className="flex items-center gap-2 px-3">
-          <SidebarTrigger />
-          <Separator orientation="vertical" className="mr-2 h-4" />
-          <RootBreadcrumbsFallback deckId={deckId} isBrowse={isBrowse} isReview={isReview} />
-        </div>
-      </PageLayoutHeader>
-      <PageLayoutContent className="gap-4">
-        <PageContentFallback />
-      </PageLayoutContent>
-    </>
-  );
-}
-
-function PageContentFallback() {
-  return (
-    <section className="grid min-h-72 place-items-center rounded-lg border border-border bg-card p-8">
-      <p className="text-sm text-muted-foreground">Loading...</p>
-    </section>
-  );
-}
-
-function RootBreadcrumbsFallback({
-  deckId,
-  isBrowse,
-  isReview,
-}: {
-  deckId?: string;
-  isBrowse: boolean;
-  isReview: boolean;
-}) {
-  if (deckId) {
-    return <DeckBreadcrumbsContent deckId={deckId} deckName="Deck" isReview={isReview} />;
-  }
-
-  return <RootBreadcrumbs isBrowse={isBrowse} isReview={isReview} />;
 }
 
 function RootBreadcrumbs({
