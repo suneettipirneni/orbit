@@ -66,21 +66,11 @@ export default function Root() {
           <DeckList />
           <SidebarInset>
             <PageLayout>
-              <Suspense
-                fallback={
-                  <RouteFrameFallback
-                    deckId={activeDeckRoute?.params.deckId}
-                    isBrowse={Boolean(browseRoute)}
-                    isReview={Boolean(reviewRoute)}
-                  />
-                }
-              >
-                <RouteFrame
-                  deckId={activeDeckRoute?.params.deckId}
-                  isBrowse={Boolean(browseRoute)}
-                  isReview={Boolean(reviewRoute)}
-                />
-              </Suspense>
+              <RouteFrame
+                deckId={activeDeckRoute?.params.deckId}
+                isBrowse={Boolean(browseRoute)}
+                isReview={Boolean(reviewRoute)}
+              />
             </PageLayout>
           </SidebarInset>
         </SidebarProvider>
@@ -182,7 +172,7 @@ function RootBreadcrumbs({
         <BreadcrumbList className="min-w-0 flex-nowrap">
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link to="/">Decks</Link>
+              <Link to="/">Overview</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
@@ -201,7 +191,7 @@ function RootBreadcrumbs({
     <Breadcrumb className="min-w-0">
       <BreadcrumbList className="min-w-0 flex-nowrap">
         <BreadcrumbItem className="min-w-0">
-          <BreadcrumbPage className="block truncate">Decks</BreadcrumbPage>
+          <BreadcrumbPage className="block truncate">Overview</BreadcrumbPage>
         </BreadcrumbItem>
       </BreadcrumbList>
     </Breadcrumb>
@@ -229,7 +219,7 @@ function DeckBreadcrumbsContent({
       <BreadcrumbList className="min-w-0 flex-nowrap">
         <BreadcrumbItem className="min-w-0">
           <BreadcrumbLink asChild>
-            <Link to="/">Decks</Link>
+            <Link to="/">Overview</Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />

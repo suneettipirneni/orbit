@@ -1,0 +1,51 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as SidebarStories from "./sidebar.stories";
+
+<Meta of={SidebarStories} />
+
+# Sidebar
+
+Use the sidebar primitives for Orbit app navigation surfaces: deck libraries,
+browser filters, and route-level navigation. The component is stateful through
+`SidebarProvider`, supports collapsed icon mode, and keeps tooltip content
+available for collapsed menu buttons.
+
+## Deck Library
+
+Full app-like composition with header identity, search, active menu items,
+badges, submenu rows, footer actions, and rail collapse.
+
+<Canvas of={SidebarStories.DeckLibrary} />
+
+## Collapsed Icon Rail
+
+Collapsed desktop state for checking icon alignment, hidden labels, rail hit
+target, and tooltip affordances.
+
+<Canvas of={SidebarStories.CollapsedIconRail} />
+
+## Trigger Interaction
+
+Verifies the public `SidebarTrigger` path from collapsed to expanded state.
+
+<Canvas of={SidebarStories.TriggerInteraction} />
+
+## Floating Variant
+
+Rounded, inset chrome for surfaces that need separation from the canvas.
+
+<Canvas of={SidebarStories.FloatingVariant} />
+
+## Inset Variant
+
+Inset layout for app shells where the content surface participates in the
+sidebar state.
+
+<Canvas of={SidebarStories.InsetVariant} />
+
+## Loading State
+
+Skeleton-only sidebar for pending deck library and sync states.
+
+<Canvas of={SidebarStories.LoadingState} />

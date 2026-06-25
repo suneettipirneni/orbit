@@ -1,0 +1,39 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as BadgeStories from "./badge.stories";
+
+<Meta of={BadgeStories} />
+
+# Badge
+
+Badges encode compact card, deck, and import metadata. Orbit adds study-state
+variants on top of the base shadcn-style variants so product screens can use a
+consistent language for Anki workflow states.
+
+## Import
+
+```tsx
+import { Badge } from "@orbit/ui";
+```
+
+## Study Variants
+
+- `new` for unseen cards or new imports.
+- `learning` for cards still in active learning steps.
+- `review` for scheduled review cards.
+- `suspended` for inactive cards.
+- `archived` for muted historical records.
+
+Use `destructive` for error and missing-media states.
+
+## Review Status
+
+<Canvas of={BadgeStories.ReviewStatus} />
+
+## Study States
+
+<Canvas of={BadgeStories.StudyStates} />
+
+## Linked Tag
+
+<Canvas of={BadgeStories.LinkedTag} />

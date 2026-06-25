@@ -1,0 +1,31 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as DataSurfaceStories from "./data-surface.stories";
+
+<Meta of={DataSurfaceStories} />
+
+# Data Surface
+
+Data surfaces combine `Card`, `Table`, `Badge`, and small icon buttons into the
+dense review and import views shown in the Orbit brand guide. They are patterns,
+not a single monolithic component: compose the primitives so each route can keep
+its own data model and actions.
+
+## Import
+
+```tsx
+import { Badge, Button, Card, Table } from "@orbit/ui";
+```
+
+## Guidelines
+
+- Use `Card` when a table or panel is a standalone object with its own actions.
+- Use `Table` for scan-heavy data such as due cards, import logs, and deck lists.
+- Add `tabular-nums` to numeric cells.
+- Use Orbit badge variants for card states: `new`, `learning`, `review`,
+  `suspended`, and `archived`.
+- Icon-only table actions must include an `aria-label`.
+
+## Review Table
+
+<Canvas of={DataSurfaceStories.ReviewTable} />

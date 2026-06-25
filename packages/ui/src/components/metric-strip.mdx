@@ -1,0 +1,47 @@
+import { Canvas, Controls, Meta, Story } from "@storybook/addon-docs/blocks";
+
+import * as MetricStories from "./metric-strip.stories";
+
+<Meta of={MetricStories} />
+
+# Metric Strip
+
+`MetricStrip` is an Orbit-specific component for compact study counters such as due
+cards, new cards, review count, and estimated time. Use it when several short
+metrics belong to the same context and should read as one grouped summary.
+
+The component renders a semantic `dl`, and each `MetricItem` renders a `dt` and
+`dd`. Numeric values use tabular figures to avoid layout shift when counts
+change.
+
+## Import
+
+```tsx
+import { MetricItem, MetricStrip } from "@orbit/ui";
+```
+
+## Usage
+
+```tsx
+<MetricStrip className="[--metric-count:5]">
+  <MetricItem label="Due" value="128" />
+  <MetricItem label="New" value="32" />
+  <MetricItem label="Learning" value="24" />
+  <MetricItem label="Review" value="72" />
+  <MetricItem label="Time" value="45" detail="min" />
+</MetricStrip>
+```
+
+Use `[--metric-count:n]` to match the desktop column count to the number of
+items. On small screens, the strip stacks into full-width rows.
+
+## Today
+
+<Canvas of={MetricStories.Today} />
+
+## Deck Progress
+
+Pair the strip with `Card` and `Progress` when a metric needs a follow-up list or
+progress breakdown.
+
+<Canvas of={MetricStories.DeckProgress} />

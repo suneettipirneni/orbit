@@ -1,0 +1,33 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as FieldControlStories from "./field-controls.stories";
+
+<Meta of={FieldControlStories} />
+
+# Field Controls
+
+Orbit field controls are compact desktop-first controls with mobile-safe text
+sizes and tap targets. Use the shared `Input`, `NativeSelect`, `Switch`, and
+`Checkbox` primitives instead of styling raw controls in product code.
+
+## Import
+
+```tsx
+import { Checkbox, Input, NativeSelect, Switch } from "@orbit/ui";
+```
+
+## Guidelines
+
+- Always provide a `name` for form fields.
+- Pair visible labels with `htmlFor` and `id`, or provide an `aria-label`.
+- Use `NativeSelect` for simple deck, tag, and filter choices.
+- Keep search icons inside the input wrapper and add left padding to the input.
+- Wrap checkbox and switch rows in a `<label>` when the whole row should toggle.
+
+## Search And Filters
+
+<Canvas of={FieldControlStories.SearchAndFilters} />
+
+## Preferences
+
+<Canvas of={FieldControlStories.Preferences} />

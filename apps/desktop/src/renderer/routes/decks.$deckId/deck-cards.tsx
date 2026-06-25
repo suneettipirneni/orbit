@@ -1,5 +1,5 @@
 import { formatDueDate } from "@/lib/date-format";
-import { useDeckCardsQuery } from "@/lib/queries/deck";
+import { useDeckCardsQuery, useSuspenseDeckCardsQuery } from "@/lib/queries/deck";
 import type { CardPreview, PaginatedResponse } from "@orbit/types";
 import {
   DataTableColumnVisibility,
@@ -164,24 +164,6 @@ function DeckCardTableSkeleton() {
   );
 }
 
-export function DeckCardsFallback() {
-  return (
-    <section
-      aria-busy="true"
-      aria-label="Loading cards"
-      className="flex min-h-0 flex-1 flex-col gap-3"
-    >
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <h2 className="text-base font-semibold tracking-normal">Cards</h2>
-          <Skeleton className="mt-2 h-4 w-40" />
-        </div>
-      </div>
-      <DeckCardTableSkeleton />
-    </section>
-  );
-}
-
 export function DeckCards({ deckId }: { deckId: string }) {
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
@@ -192,28 +174,18 @@ export function DeckCards({ deckId }: { deckId: string }) {
     deckId: string;
   } | null>(null);
 
-  const {
-    data: [queriedCardsPage] = [],
-    isFetching,
-    isLoading,
-  } = useDeckCardsQuery(deckId, {
+  const { data: queriedCardsPage } = useSuspenseDeckCardsQuery(deckId, {
     page: pagination.pageIndex + 1,
     pageSize: pagination.pageSize,
   });
   const cardsPage =
     queriedCardsPage ?? (retainedCardsPage?.deckId === deckId ? retainedCardsPage.cardsPage : null);
-  const isPaginationPending = Boolean(cardsPage && (isFetching || isLoading || !queriedCardsPage));
-  const CardsTableTransition = React.ViewTransition ?? React.Fragment;
 
   React.useEffect(() => {
     if (queriedCardsPage) {
       setRetainedCardsPage({ cardsPage: queriedCardsPage, deckId });
     }
   }, [deckId, queriedCardsPage]);
-
-  if (!cardsPage) {
-    return <DeckCardsFallback />;
-  }
 
   return (
     <section className="flex min-h-0 flex-col gap-3">
@@ -225,14 +197,11 @@ export function DeckCards({ deckId }: { deckId: string }) {
           </p>
         </div>
       </div>
-      <CardsTableTransition default="none" enter="deck-cards-table-enter">
-        <DeckCardTable
-          cardsPage={cardsPage}
-          isPaginationPending={isPaginationPending}
-          onPaginationChange={setPagination}
-          pagination={pagination}
-        />
-      </CardsTableTransition>
+      <DeckCardTable
+        cardsPage={cardsPage}
+        onPaginationChange={setPagination}
+        pagination={pagination}
+      />
     </section>
   );
 }

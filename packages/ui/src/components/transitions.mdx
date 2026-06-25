@@ -1,0 +1,64 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as TransitionStories from "./transitions.stories";
+
+<Meta of={TransitionStories} />
+
+# Transitions
+
+Orbit UI includes a reusable `t-*` motion layer from `transitions-dev`. These
+classes are framework-agnostic CSS hooks: production components can opt in by
+adding the documented classes and state attributes while keeping state ownership
+in React.
+
+The transition variables and snippets are imported through `@orbit/ui/styles.css`
+via `src/transitions.css`.
+
+## Available Hooks
+
+- `t-digit-group` / `t-digit` for number pop-in counters.
+- `t-badge` / `t-badge-dot` for notification badges on icon buttons.
+- `t-icon-swap` / `t-icon` for swapping two icons in one slot.
+- `t-skel` / `t-skel-skeleton` / `t-skel-content` for skeleton reveal.
+- `t-tabs` / `t-tabs-pill` / `t-tab` for sliding segmented controls.
+- `t-tt-wrap` / `t-tt-trigger` / `t-tt` for pure CSS tooltips.
+
+Every snippet includes a `prefers-reduced-motion` guard in `transitions.css`.
+
+## Number Pop-In
+
+Use for card counts, due totals, import counts, and other tabular metrics.
+
+<Canvas of={TransitionStories.NumberPopIn} />
+
+## Notification Badge
+
+Place the badge inside a positioned trigger and toggle `data-open`.
+
+<Canvas of={TransitionStories.NotificationBadge} />
+
+## Icon Swap
+
+Keep both icons in the DOM and switch `data-state` between `a` and `b`.
+
+<Canvas of={TransitionStories.IconSwap} />
+
+## Skeleton Reveal
+
+Stack skeleton and content in the same slot, then add `is-revealed` when content
+is ready.
+
+<Canvas of={TransitionStories.SkeletonReveal} />
+
+## Sliding Tabs
+
+Use when a small segmented control needs a moving active pill. React should
+measure the selected tab and write pill `transform` and `width`.
+
+<Canvas of={TransitionStories.SlidingTabs} />
+
+## Tooltip
+
+Pure CSS hover/focus tooltip for icon-heavy controls.
+
+<Canvas of={TransitionStories.Tooltip} />

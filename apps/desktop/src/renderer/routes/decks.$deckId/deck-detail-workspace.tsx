@@ -1,11 +1,11 @@
-import { Suspense, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { Play } from "lucide-react";
 import { Link } from "react-router";
 import type { DeckDetail } from "@orbit/types";
 import { Button } from "@orbit/ui/components/button";
 import { useSuspenseDeckQuery } from "@/lib/queries/deck";
 import { DeckDetails } from "./deck-details";
-import { DeckCards, DeckCardsFallback } from "./deck-cards";
+import { DeckCards } from "./deck-cards";
 
 export function DeckDetailWorkspace({ deckId }: { deckId: string }) {
   const { data: deck } = useSuspenseDeckQuery(deckId);
@@ -19,15 +19,7 @@ export function DeckDetailWorkspace({ deckId }: { deckId: string }) {
   }
 
   return (
-    <DeckDetailContent
-      cards={
-        <Suspense fallback={<DeckCardsFallback />}>
-          <DeckCards deckId={deckId} />
-        </Suspense>
-      }
-      deckDetail={deck}
-      deckId={deckId}
-    />
+    <DeckDetailContent cards={<DeckCards deckId={deckId} />} deckDetail={deck} deckId={deckId} />
   );
 }
 

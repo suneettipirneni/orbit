@@ -1,0 +1,38 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as ButtonStories from "./button.stories";
+
+<Meta of={ButtonStories} />
+
+# Button
+
+Buttons follow Orbit's compact product UI style: 8px-or-smaller radii, Geist text,
+Orbit Blue for the primary action, and subdued secondary actions. Use only one
+filled primary action per page or dialog.
+
+## Import
+
+```tsx
+import { Button } from "@orbit/ui";
+```
+
+## Guidelines
+
+- `variant="primary"` and `variant="default"` are visually equivalent.
+- Use `secondary`, `outline`, `ghost`, or `tertiary` for supporting actions.
+- Icon-only buttons need an `aria-label`.
+- Buttons default to `type="button"` so they do not accidentally submit forms.
+- Use `data-icon="inline-start"` or `data-icon="inline-end"` on inline icons to
+  keep asymmetric padding consistent.
+
+## Primary Action
+
+<Canvas of={ButtonStories.PrimaryAction} />
+
+## Action Set
+
+<Canvas of={ButtonStories.ActionSet} />
+
+## Destructive Secondary
+
+<Canvas of={ButtonStories.DestructiveSecondary} />

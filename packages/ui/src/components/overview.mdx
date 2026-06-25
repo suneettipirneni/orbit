@@ -1,0 +1,40 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+
+import * as ButtonStories from "./button.stories";
+import * as MetricStories from "./metric-strip.stories";
+
+<Meta title="Orbit UI/Overview" />
+
+# Orbit UI
+
+The UI package implements the Orbit brand kit as reusable React primitives. The
+core visual language is a frost canvas, ink text, Orbit Blue primary actions,
+subtle blue-gray horizons, compact controls, and tabular study metrics.
+
+## Tokens
+
+| Token        | Value     | Use                                     |
+| ------------ | --------- | --------------------------------------- |
+| Frost Canvas | `#f8fbfc` | App canvas and Storybook background     |
+| Ink          | `#16202a` | Primary text and high-contrast surfaces |
+| Orbit Blue   | `#197a96` | Primary actions, focus rings, progress  |
+| Horizon      | `#d0ecf3` | Soft highlights and selected states     |
+| Signal Amber | `#d6a331` | Learning and warning metadata           |
+| Review Green | `#42c9a6` | Review success and progress             |
+| Error Red    | `#c9483f` | Error and missing states                |
+
+## Component Slices
+
+- `Button` for page actions and compact icon controls.
+- `Badge` for study states, import states, and tags.
+- `Input`, `NativeSelect`, `Switch`, and `Checkbox` for form controls.
+- `MetricStrip` for Orbit-specific study summaries.
+- `Card` and `Table` for dense data surfaces.
+
+## Primary Action
+
+<Canvas of={ButtonStories.PrimaryAction} />
+
+## Study Metrics
+
+<Canvas of={MetricStories.Today} />

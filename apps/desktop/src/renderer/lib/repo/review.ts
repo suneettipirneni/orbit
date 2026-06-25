@@ -1,4 +1,4 @@
-import { and, asc, eq, isNull, sql, type Query } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, sql, type Query } from "drizzle-orm";
 import type {
   CardWithNote,
   DueCardsInput,
@@ -13,6 +13,27 @@ import { cards, decks, notes, reviews } from "@/lib/powersync-schema";
 import { getCard } from "@/lib/repo/card";
 
 const defaultLeechThreshold = 8;
+
+export interface RecentReviewActivityItem {
+  cardId: string;
+  createdAt: string;
+  deckId: string;
+  deckName: string;
+  elapsedSeconds: number;
+  front: string;
+  id: string;
+  rating: number;
+}
+
+export interface ReviewHeatmapDay {
+  date: string;
+  reviews: number;
+}
+
+export interface UpcomingReviewDay {
+  date: string;
+  dueCards: number;
+}
 
 export function dueCardsQuery(input: DueCardsInput = {}) {
   return paginatedRowsQuery(dueCardsRowsQuery(input), input);
@@ -56,6 +77,108 @@ function todayStudySummaryRowsQuery() {
       ),
     )
     .limit(1);
+}
+
+export function recentReviewActivityQuery(input: { limit?: number } = {}) {
+  return mappedRowsQuery(recentReviewActivityRowsQuery(input), (rows) =>
+    rows.map((row) => ({
+      cardId: row.cardId,
+      createdAt: row.createdAt,
+      deckId: row.deckId,
+      deckName: row.deckName,
+      elapsedSeconds: Math.max(0, Math.round((row.elapsedMilliseconds ?? 0) / 1000)),
+      front: row.front,
+      id: row.id,
+      rating: row.rating,
+    })),
+  );
+}
+
+function recentReviewActivityRowsQuery(input: { limit?: number } = {}) {
+  return db
+    .select({
+      cardId: reviews.cardId,
+      createdAt: reviews.createdAt,
+      deckId: decks.id,
+      deckName: decks.name,
+      elapsedMilliseconds: reviews.elapsedMilliseconds,
+      front: notes.front,
+      id: reviews.id,
+      rating: reviews.rating,
+    })
+    .from(reviews)
+    .innerJoin(cards, eq(cards.id, reviews.cardId))
+    .innerJoin(notes, eq(notes.id, cards.noteId))
+    .innerJoin(decks, eq(decks.id, cards.deckId))
+    .where(reviewActivityFilter())
+    .orderBy(desc(reviews.createdAt), desc(reviews.id))
+    .limit(Math.min(20, Math.max(1, input.limit ?? 5)));
+}
+
+export function reviewHeatmapQuery(input: { days?: number } = {}) {
+  return mappedRowsQuery(reviewHeatmapRowsQuery(input), (rows) =>
+    rows.map((row) => ({
+      date: row.date,
+      reviews: row.reviews,
+    })),
+  );
+}
+
+function reviewHeatmapRowsQuery(input: { days?: number } = {}) {
+  const reviewDate = sql<string>`date(${reviews.createdAt})`;
+  const [startIso, endIso] = trailingDateRangeParameters(input.days ?? 84);
+
+  return db
+    .select({
+      date: reviewDate,
+      reviews: sql<number>`count(${reviews.id})`,
+    })
+    .from(reviews)
+    .innerJoin(cards, eq(cards.id, reviews.cardId))
+    .innerJoin(notes, eq(notes.id, cards.noteId))
+    .innerJoin(decks, eq(decks.id, cards.deckId))
+    .where(
+      and(
+        reviewActivityFilter(),
+        sql`${reviews.createdAt} >= ${startIso}`,
+        sql`${reviews.createdAt} < ${endIso}`,
+      ),
+    )
+    .groupBy(reviewDate)
+    .orderBy(asc(reviewDate));
+}
+
+export function upcomingReviewDaysQuery(input: { days?: number } = {}) {
+  return mappedRowsQuery(upcomingReviewDaysRowsQuery(input), (rows) =>
+    rows.map((row) => ({
+      date: row.date,
+      dueCards: row.dueCards,
+    })),
+  );
+}
+
+function upcomingReviewDaysRowsQuery(input: { days?: number } = {}) {
+  const dueDate = sql<string>`date(${cards.dueAt})`;
+  const [startIso, endIso] = dateRangeParameters(input.days ?? 7);
+
+  return db
+    .select({
+      date: dueDate,
+      dueCards: sql<number>`count(${cards.id})`,
+    })
+    .from(cards)
+    .innerJoin(notes, eq(notes.id, cards.noteId))
+    .innerJoin(decks, eq(decks.id, cards.deckId))
+    .where(
+      and(
+        activeCardFilter(),
+        sql`${cards.dueAt} >= ${startIso}`,
+        sql`${cards.dueAt} < ${endIso}`,
+        sql`coalesce(${cards.ankiQueue}, 0) not in (-1, -2, -3)`,
+      ),
+    )
+    .groupBy(dueDate)
+    .orderBy(asc(dueDate));
 }
 
 export async function listDueCards(
@@ -277,6 +400,10 @@ function activeCardFilter() {
   return and(isNull(cards.deletedAt), isNull(notes.deletedAt), isNull(decks.deletedAt));
 }
 
+function reviewActivityFilter() {
+  return and(isNull(reviews.deletedAt), activeCardFilter());
+}
+
 function dueCardFilter() {
   return and(
     activeCardFilter(),
@@ -328,11 +455,24 @@ function currentTimestampSql() {
 }
 
 function todayBoundsParameters() {
-  const now = new Date();
-  const startOfDay = new Date(now);
+  return dateRangeParameters(1);
+}
+
+function dateRangeParameters(days: number) {
+  const startOfDay = new Date();
   startOfDay.setUTCHours(0, 0, 0, 0);
   const endOfDay = new Date(startOfDay);
-  endOfDay.setUTCDate(startOfDay.getUTCDate() + 1);
+  endOfDay.setUTCDate(startOfDay.getUTCDate() + Math.max(1, days));
+
+  return [startOfDay.toISOString(), endOfDay.toISOString()] as const;
+}
+
+function trailingDateRangeParameters(days: number) {
+  const endOfDay = new Date();
+  endOfDay.setUTCHours(0, 0, 0, 0);
+  endOfDay.setUTCDate(endOfDay.getUTCDate() + 1);
+  const startOfDay = new Date(endOfDay);
+  startOfDay.setUTCDate(startOfDay.getUTCDate() - Math.max(1, days));
 
   return [startOfDay.toISOString(), endOfDay.toISOString()] as const;
 }

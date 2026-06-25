@@ -11,4 +11,5 @@ out
 *.db-shm
 *.db-wal
 coverage
+storybook-static
 .DS_Store

@@ -126,10 +126,14 @@ export function DeckList() {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={!isBrowseActive} tooltip="Decks">
+                <SidebarMenuButton
+                  asChild
+                  isActive={!isBrowseActive && !activeDeckId}
+                  tooltip="Overview"
+                >
                   <NavLink to="/">
                     <LibraryBig className="size-4" />
-                    <span>Decks</span>
+                    <span>Overview</span>
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
